@@ -4,6 +4,7 @@ import glob
 from typing import List
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.remote.webelement import WebElement
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver import ActionChains
@@ -27,6 +28,11 @@ class WhatsApp:
         return None
 
     def start(self) -> bool:
+        """Starts the bot
+        
+        Returns:
+            bool: True if the bot started successfully
+        """
         chrome_options = Options()
         chrome_options.add_argument("--headless")
         chrome_options.add_argument('window-size=1920x2160')
@@ -53,6 +59,11 @@ class WhatsApp:
         return self.__autentication()
 
     def __autentication(self) -> bool:
+        """Authenticates the bot
+
+        Returns:
+            bool: True if the bot authenticated successfully
+        """
         try:
             WebDriverWait(self.driver, 60).until(
                 EC.any_of(
@@ -98,6 +109,11 @@ class WhatsApp:
                 return True
 
     def close(self) -> None:
+        """Closes the bot
+
+        Returns:
+            None
+        """
         self.driver.close()
 
 
@@ -107,30 +123,76 @@ class Chat:
         self._chats = []
 
     def update(self) -> bool:
-        def if_muted(element) -> bool:
+        """Updates the chat list
+
+        Returns:
+            bool: True if the chat list updated successfully, False otherwise
+        """
+        
+        def if_muted(element: WebElement) -> bool:
+            """Checks if the chat is muted
+            
+            Args:
+                element (WebElement): The chat element
+
+            Returns:
+                bool: True if the chat is muted, False otherwise
+            """
             if element.find_elements(By.XPATH, """
             *//span[@data-testid="muted"]
             """):
                 return True
             return False
 
-        def is_group(text: list) -> bool:
+        def is_group(text: list[str]) -> bool:
+            """Checks if the chat is a group
+
+            Args:
+                text (list): The chat text
+
+            Returns:
+                bool: True if the chat is a group, False otherwise
+            """
             if len(text) > 4:
                 return True
             return False
 
-        def unread_messages(text: list) -> int:
+        def unread_messages(text: list[str]) -> int:
+            """Gets the number of unread messages
+
+            Args:
+                text (list): The chat text
+
+            Returns:
+                int: The number of unread messages
+            """
             try:
                 return int(text[-1])
             except ValueError:
                 return 0
 
-        def last_message(text: list) -> str:
+        def last_message(text: list[str]) -> str:
+            """Gets the last message
+
+            Args:
+                text (list): The chat text
+
+            Returns:
+                str: The last message
+            """
             if is_group(text):
                 return text[4].lower()
             return text[2].lower()
 
-        def last_message_time(text: list) -> str:
+        def last_message_time(text: list[str]) -> datetime.time:
+            """Gets the last message time
+
+            Args:
+                text (list): The chat text
+
+            Returns:
+                datetime.time: The last message time
+            """
             seconds = datetime.now().time().second
             if self.verify_last_message(text):
                 return time(int(text.split(":")[0]), int(
@@ -197,24 +259,56 @@ class Chat:
             except StaleElementReferenceException:
                 return self.update()
 
-    def return_messages(self, id_chat: any) -> list:
+    def return_messages(self, id_chat: WebElement) -> list[str]:
+        """Returns the messages of a chat
+
+        Args:
+            id_chat (WebElement): The chat element
+
+        Returns:
+            list: The messages of the chat
+        """
         for chats in self._chats:
             if chats['id'] == id_chat:
                 return chats['messages']
         return []
 
     def add(self, chat: dict) -> None:
+        """Adds a chat to the chat list
+        
+        Args:
+            chat (dict): The chat to be added
+            
+        Returns:
+            None
+        """
         if not self.if_exists(chat['id']):
             self._chats.append(chat)
         return None
 
-    def if_exists(self, chat_id: any) -> bool:
+    def if_exists(self, chat_id: WebElement) -> bool:
+        """Checks if a chat exists in the chat list
+
+        Args:
+            chat_id (WebElement): The chat element
+
+        Returns:
+            bool: True if the chat exists, False otherwise
+        """
         for chat in self._chats:
             if chat['id'] == chat_id:
                 return True
         return False
 
     def remove(self, chat: dict) -> None:
+        """Removes a chat from the chat list
+
+        Args:
+            chat (dict): The chat to be removed
+
+        Returns:
+            None
+        """
         if self.if_exists(chat):
             self.hold = chat
             self._chats.remove(chat)
@@ -228,10 +322,23 @@ class Chat:
         return None
 
     def reset(self) -> None:
+        """Resets the chat list
+
+        Returns:
+            None
+        """
         self._chats = []
         return None
 
     def display(self, by: str = None) -> None:
+        """Displays the chat list
+
+        Args:
+            by (str, optional): The way to display the chat list. Defaults to None.
+
+        Returns:
+            None
+        """
         def __display_groups() -> None:
             for chat in self._chats:
                 if chat['is_group']:
@@ -258,12 +365,29 @@ class Chat:
         return __display_all()
 
     def verify_last_message(self, last_message: str) -> bool:
+        """Verifies if the last message is a time
+
+        Args:
+            last_message (str): The last message
+
+        Returns:
+            bool: True if the last message is a time, False otherwise
+        """
         pattern = r"\d{2}:\d{2}"
         if re.fullmatch(pattern, last_message):
             return True
         return False
 
     def listen_chats(self, corresponded: str, timeout: int = 43200) -> dict:
+        """Listens to the chats until a chat with the corresponded message appears
+        
+        Args:
+            corresponded (str): The message to be listened
+            timeout (int, optional): The time to listen. Defaults to 12h
+            
+        Returns:
+            dict: The chat with the corresponded message
+        """
         self.update()
         try:
             WebDriverWait(self.driver, timeout).until(
@@ -282,7 +406,15 @@ class Chat:
             else:
                 return self.listen_chats(corresponded, timeout)
 
-    def listen_messages(self, chat: dict, corresponded: str, timeout: int = 0) -> dict:
+    def last_message(self, chat: dict) -> dict:
+        """Returns the last message of a chat
+
+        Args:
+            chat (dict): The chat to get the last message
+
+        Returns:
+            dict: The last message of the chat
+        """
         self.update_messages(chat)
         while True:
             if chat['messages'] is None:
@@ -294,6 +426,15 @@ class Chat:
                 return None
 
     def reply_message(self, chat: dict, reply: str) -> bool:
+        """Replies a message in a chat
+
+        Args:
+            chat (dict): The chat to reply the message
+            reply (str): The message to be replied
+
+        Returns:
+            bool: True if the message was replied, False otherwise
+        """
         self.driver.execute_script(
             "arguments[0].scrollIntoView();", chat['id'])
         actionChains = ActionChains(self.driver)
@@ -365,6 +506,14 @@ class Chat:
             return True
 
     def mark_as_replied(self, chat: dict, message: dict) -> bool:
+        """Marks a message as replied
+        
+        Args:
+            chat (dict): The chat that have the message to be marked as replied
+            message (dict): The message to be marked as replied
+        Returns:
+            bool: True if the message was marked as replied, False otherwise
+        """
         if_exists = self.if_exists_message(chat, message['id'])
         if if_exists:
             chat['messages'][chat['messages'].index(
@@ -372,19 +521,46 @@ class Chat:
             return True
         return False
 
-    def if_exists_message(self, chat: dict, message_id: any) -> bool:
+    def if_exists_message(self, chat: dict, message_id: WebElement) -> bool:
+        """Verifies if a message exists in a chat
+        
+        Args:
+            chat (dict): The chat to verify if the message exists
+            message_id (WebElement): The message to be verified
+        Returns:
+            bool: True if the message exists, False otherwise
+        """
         ids_chat = [elements['id'] for elements in chat['messages']]
         if message_id in ids_chat:
             return True
         return False
 
     def add_message(self, chat: dict, message: dict) -> None:
+        """Adds a message in a chat
+
+        Args:
+            chat (dict): The chat to add the message
+            message (dict): The message to be added
+        
+        Returns:
+            None
+        """
         if not self.if_exists_message(chat, message['id']):
             chat['messages'].append(message)
         return None
 
     def create_sticker(self) -> bool:
+        """Creates a sticker from the last image in the chat
+
+        Returns:
+            bool: True if the sticker was created, False otherwise
+        """
         def delete_images() -> None:
+            """Deletes the images in the downloads folder
+            
+            Returns:
+                None
+            """
             images = glob.glob(f"{os.getcwd()}\\data\\downloads\\*.jpeg")
             for image in images:
                 os.remove(image)
