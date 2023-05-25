@@ -10,9 +10,11 @@ print('Running...')
 corresponded = '/bot'
 while True:
     chat_atual = chat.listen_chats(corresponded)
-    message = chat.listen_messages(chat_atual, chat_atual['last_message'])
+    message = chat.listen_messages(chat_atual, corresponded)
+    if message is None:
+        continue
     if f'{corresponded} sticker' in chat_atual['last_message']:
-        if chat.create_sticker(message):
+        if chat.create_sticker():
             chat.reply_message(
                 chat_atual, '_*Bot*_: ```Sticker criado com sucesso```')
             chat.mark_as_replied(chat_atual, message)
@@ -39,4 +41,3 @@ while True:
         chat.mark_as_replied(chat_atual, message)
 # %%
 wp.close()
-# %%

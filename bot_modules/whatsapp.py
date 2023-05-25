@@ -28,8 +28,8 @@ class WhatsApp:
 
     def start(self) -> bool:
         chrome_options = Options()
-        # chrome_options.add_argument("--headless")
-        # chrome_options.add_argument('window-size=1920x2160')
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument('window-size=1920x2160')
         chrome_options.add_experimental_option(
             'excludeSwitches', ['enable-logging'])
         chrome_options.add_argument("--disable-extensions")
@@ -127,8 +127,8 @@ class Chat:
 
         def last_message(text: list) -> str:
             if is_group(text):
-                return text[4]
-            return text[2]
+                return text[4].lower()
+            return text[2].lower()
 
         def last_message_time(text: list) -> str:
             seconds = datetime.now().time().second
@@ -282,19 +282,16 @@ class Chat:
             else:
                 return self.listen_chats(corresponded, timeout)
 
-    def listen_messages(self, chat: dict, correspond: str, timeout: int = 0) -> dict:
+    def listen_messages(self, chat: dict, corresponded: str, timeout: int = 0) -> dict:
         self.update_messages(chat)
         while True:
             if chat['messages'] is None:
-                return False
+                return None
             for message in chat['messages']:
-                if message['replied']:
-                    continue
-                if correspond in message['message']:
+                if not message['replied']:
                     return message
             else:
-                sleep(timeout)
-                self.update_messages(chat)
+                return None
 
     def reply_message(self, chat: dict, reply: str) -> bool:
         self.driver.execute_script(
@@ -351,45 +348,26 @@ class Chat:
         except TimeoutException:
             return False
         finally:
-            aplication = self.driver.find_element(By.XPATH,
-                                                  """
-                                     //div[@role='application']
+            message_boxes = self.driver.find_elements(By.XPATH,
+                                                      """
+                                     //div[@data-testid='msg-container']
                                      """
-                                                  )
-            message_boxes = aplication.find_elements(By.XPATH,
-                                                     """
-                                     .//div[@role='row']
-                                     """
-                                                     )
-            for message_box in message_boxes:
-                messages = {}
-                try:
-                    element = message_box.find_element(By.XPATH,
-                                                       """
-                                            .//div[@data-testid='msg-container']
-                                            """)
-                except NoSuchElementException:
-                    continue
-                if self.if_exists_message(chat, element):
-                    continue
-                text = message_box.text.split("\n")
-                if len(text) != 2:
-                    continue
-                messages['time'] = message_time(text[1])
-                if verify_time(messages['time']):
-                    continue
-                messages['id'] = element
-                messages['message'] = 'audio' if is_audio(
-                    text[0]) else text[0].lower()
-                messages['replied'] = False
-                self.add_message(chat, messages)
-            self.update()
+                                                      )
+            message_box = message_boxes[-1]
+            messages = {}
+            text = message_box.text.split("\n")
+            messages['time'] = message_time(text[1])
+            messages['id'] = message_box.text
+            messages['message'] = 'audio' if is_audio(
+                text[0]) else text[0].lower()
+            messages['replied'] = False
+            self.add_message(chat, messages)
             return True
 
     def mark_as_replied(self, chat: dict, message: dict) -> bool:
-        if_exists_message = self.if_exists_message(chat, message['id'])
-        if if_exists_message:
-            self._chats[self._chats.index(chat)]['messages'][chat['messages'].index(
+        if_exists = self.if_exists_message(chat, message['id'])
+        if if_exists:
+            chat['messages'][chat['messages'].index(
                 message)]['replied'] = True
             return True
         return False
@@ -405,15 +383,23 @@ class Chat:
             chat['messages'].append(message)
         return None
 
-    def create_sticker(self, message: dict) -> bool:
+    def create_sticker(self) -> bool:
         def delete_images() -> None:
             images = glob.glob(f"{os.getcwd()}\\data\\downloads\\*.jpeg")
             for image in images:
                 os.remove(image)
             return None
+        elements = self.driver.find_elements(By.XPATH,
+                                             """
+                                                //div[@data-testid="media-url-provider"]
+                                                """)
+        try:
+            element = elements[-1]
+        except IndexError:
+            return False
         self.driver.execute_script(
-            "arguments[0].scrollIntoView();", message['id'])
-        message['id'].click()
+            "arguments[0].scrollIntoView();", element)
+        element.click()
         try:
             WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable((By.XPATH,
                                                                             """
@@ -547,6 +533,4 @@ class Chat:
         if by is None:
             return __archive_all()
         return None
-
-
 # %%
