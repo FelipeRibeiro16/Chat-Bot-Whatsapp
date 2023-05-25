@@ -1,44 +1,42 @@
 # %%
 from bot_modules import whatsapp
+from bot_modules import chat as chat_module
 wp = whatsapp()
 wp.start()
-chat = wp.Chat(wp.driver)
+driver = wp.driver
+chat = chat_module(driver)
 # %%
 print('Running...')
 corresponded = '/bot'
 while True:
-    chat_atual = chat.listen_chats()
-    if corresponded not in chat_atual['last_message']:
-        continue
-    else:
-        message = chat.listen_messages(chat_atual, corresponded)
-        if message['message'] == f'{corresponded} sticker':
-            if chat.create_sticker(message):
-                chat.reply_message(
-                    chat_atual, '_*Bot*_: ```Sticker criado com sucesso```')
-                chat.mark_as_replied(chat_atual, message)
-            else:
-                chat.reply_message(
-                    chat_atual, '_*Bot*_: ```Falha na criação do sticker```')
-                chat.mark_as_replied(chat_atual, message)
-        elif message['message'] == f'{corresponded} sair':
-            break
-        elif message['message'] == f'{corresponded} oi':
-            chat.reply_message(chat_atual, '_*Bot*_: ```Olá, tudo bem?```')
-            chat.mark_as_replied(chat_atual, message)
-        elif message['message'] == f'{corresponded} tchau':
-            chat.reply_message(chat_atual, '_*Bot*_: ```Tchau!```')
-            chat.mark_as_replied(chat_atual, message)
-        elif message['message'] == f'{corresponded} display':
-            chat.display()
-            chat.reply_message(chat_atual, '_*Bot*_: ```Na tela!```')
+    chat_atual = chat.listen_chats(corresponded)
+    message = chat.listen_messages(chat_atual, chat_atual['last_message'])
+    if f'{corresponded} sticker' in chat_atual['last_message']:
+        if chat.create_sticker(message):
+            chat.reply_message(
+                chat_atual, '_*Bot*_: ```Sticker criado com sucesso```')
             chat.mark_as_replied(chat_atual, message)
         else:
-            chat.reply_message(chat_atual, '_*Bot*_: ```Não entendi```')
+            chat.reply_message(
+                chat_atual, '_*Bot*_: ```Falha na criação do sticker```')
             chat.mark_as_replied(chat_atual, message)
-    if message['message'] == f'{corresponded} sair':
+    elif f'{corresponded} sair' in chat_atual['last_message']:
         chat.reply_message(chat_atual, '*Bot*: Saindo!')
+        chat.mark_as_replied(chat_atual, message)
         break
+    elif f'{corresponded} oi' in chat_atual['last_message']:
+        chat.reply_message(chat_atual, '_*Bot*_: ```Olá, tudo bem?```')
+        chat.mark_as_replied(chat_atual, message)
+    elif f'{corresponded} tchau' in chat_atual['last_message']:
+        chat.reply_message(chat_atual, '_*Bot*_: ```Tchau!```')
+        chat.mark_as_replied(chat_atual, message)
+    elif f'{corresponded} display' in chat_atual['last_message']:
+        chat.display()
+        chat.reply_message(chat_atual, '_*Bot*_: ```Na tela!```')
+        chat.mark_as_replied(chat_atual, message)
+    else:
+        chat.reply_message(chat_atual, '_*Bot*_: ```Não entendi```')
+        chat.mark_as_replied(chat_atual, message)
 # %%
 wp.close()
 # %%

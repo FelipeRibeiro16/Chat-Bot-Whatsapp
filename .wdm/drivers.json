@@ -1,6 +1,6 @@
 {
-    "win32_chromedriver_latest_for_113.0.5672": {
-        "timestamp": "20/05/2023",
-        "binary_path": "c:\\Projetos\\Organizador Whatsapp\\.wdm\\drivers\\chromedriver\\win32\\113.0.5672.63\\chromedriver.exe"
+    "win32_chromedriver_113.0.5672_for_113.0.5672": {
+        "timestamp": "24/05/2023",
+        "binary_path": "c:\\Projetos\\Organizador Whatsapp\\.wdm\\drivers\\chromedriver\\win32\\113.0.5672\\chromedriver.exe"
     }
 }

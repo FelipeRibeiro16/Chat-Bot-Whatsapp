@@ -1,3 +1,29 @@
-2023/05/23-23:44:28.333 2244 Reusing MANIFEST c:\Projetos\Organizador Whatsapp\data\bot-data\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2023/05/23-23:44:28.334 2244 Recovering log #3133
-2023/05/23-23:44:28.350 2244 Reusing old log c:\Projetos\Organizador Whatsapp\data\bot-data\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/003133.log 
+2023/05/25-01:34:54.665 3dc0 Reusing MANIFEST c:\Projetos\Organizador Whatsapp\data\bot-data\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2023/05/25-01:34:54.671 3dc0 Recovering log #3904
+2023/05/25-01:34:54.674 3dc0 Reusing old log c:\Projetos\Organizador Whatsapp\data\bot-data\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/003904.log 
+2023/05/25-01:35:05.636 3298 Compacting 1@1 + 11@2 files
+2023/05/25-01:35:05.701 3298 Generated table #3921@1: 29733 keys, 2196736 bytes
+2023/05/25-01:35:05.776 3298 Generated table #3922@1: 27459 keys, 2260592 bytes
+2023/05/25-01:35:05.844 3298 Generated table #3923@1: 27283 keys, 2256922 bytes
+2023/05/25-01:35:05.902 3298 Generated table #3924@1: 28076 keys, 2253130 bytes
+2023/05/25-01:35:05.993 3298 Generated table #3925@1: 25845 keys, 2281805 bytes
+2023/05/25-01:35:06.057 3298 Generated table #3926@1: 10560 keys, 2151957 bytes
+2023/05/25-01:35:06.112 3298 Generated table #3927@1: 10529 keys, 2136796 bytes
+2023/05/25-01:35:06.163 3298 Generated table #3928@1: 42238 keys, 2175508 bytes
+2023/05/25-01:35:06.244 3298 Generated table #3929@1: 109895 keys, 2262623 bytes
+2023/05/25-01:35:06.316 3298 Generated table #3930@1: 105798 keys, 2254933 bytes
+2023/05/25-01:35:06.320 3298 Generated table #3931@1: 3143 keys, 66224 bytes
+2023/05/25-01:35:06.320 3298 Compacted 1@1 + 11@2 files => 22297226 bytes
+2023/05/25-01:35:06.321 3298 compacted to: files[ 0 1 32 0 0 0 0 ]
+2023/05/25-01:35:06.321 3298 Delete type=2 #3890
+2023/05/25-01:35:06.321 3298 Delete type=2 #3892
+2023/05/25-01:35:06.321 3298 Delete type=2 #3893
+2023/05/25-01:35:06.321 3298 Delete type=2 #3894
+2023/05/25-01:35:06.321 3298 Delete type=2 #3895
+2023/05/25-01:35:06.321 3298 Delete type=2 #3896
+2023/05/25-01:35:06.321 3298 Delete type=2 #3897
+2023/05/25-01:35:06.321 3298 Delete type=2 #3898
+2023/05/25-01:35:06.321 3298 Delete type=2 #3899
+2023/05/25-01:35:06.321 3298 Delete type=2 #3900
+2023/05/25-01:35:06.321 3298 Delete type=2 #3901
+2023/05/25-01:35:06.321 3298 Delete type=2 #3907
