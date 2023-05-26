@@ -31,11 +31,11 @@ The commands are:
 and if you send a message with the prefix "/bot" and the bot does not recognize the command, it will respond with "Não entendi".
 
 ## Files and folders
-The main.py file uses the modules of the project to run the bot.
-The folder bot_modules contains the modules of the project.
-The whatsapp.py present in the folder bot_modules file contains the modules that is responsible for automating WhatsApp.
-The folder data contains the files that are used to store data, such as chrome cookies and the bot's download folder.
-And the .wdm folder contains the chromedriver that is used to automate the browser.
+- The main.py file uses the modules of the project to run the bot.
+- The folder bot_modules contains the modules of the project.
+- The whatsapp.py present in the folder bot_modules file contains the modules that is responsible for automating WhatsApp.
+- The folder data contains the files that are used to store data, such as chrome cookies and the bot's download folder.
+- And the .wdm folder contains the chromedriver that is used to automate the browser.
 
 ## Modules
 The modules of the project are:
