@@ -1,3 +1,6 @@
-2023/05/25-11:21:13.136 305c Reusing MANIFEST C:\Projetos\Organizador Whatsapp\data\bot-data\Default\Local Storage\leveldb/MANIFEST-000001
-2023/05/25-11:21:13.137 305c Recovering log #19
-2023/05/25-11:21:13.138 305c Reusing old log C:\Projetos\Organizador Whatsapp\data\bot-data\Default\Local Storage\leveldb/000019.log 
+2023/05/25-22:37:37.240 4788 Reusing MANIFEST c:\Projetos\Organizador Whatsapp\data\bot-data\Default\Local Storage\leveldb/MANIFEST-000001
+2023/05/25-22:37:37.242 4788 Recovering log #19
+2023/05/25-22:37:37.246 4788 Reusing old log c:\Projetos\Organizador Whatsapp\data\bot-data\Default\Local Storage\leveldb/000019.log 
+2023/05/25-23:01:38.467 f0c Level-0 table #23: started
+2023/05/25-23:01:38.473 f0c Level-0 table #23: 35659 bytes OK
+2023/05/25-23:01:38.476 f0c Delete type=0 #19

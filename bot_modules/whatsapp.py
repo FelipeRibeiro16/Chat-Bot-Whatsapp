@@ -1,7 +1,6 @@
 # %%
 from datetime import datetime, time
 import glob
-from typing import List
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.remote.webelement import WebElement
@@ -24,12 +23,21 @@ os.environ['WDM_LOCAL'] = '1'
 
 
 class WhatsApp:
+    """WhatsApp bot class that initializes the bot and closes it
+
+    Args:
+        object (object): The object class
+
+        Attributes:
+            driver (webdriver): The webdriver
+    """
+
     def __init__(self) -> None:
         return None
 
     def start(self) -> bool:
         """Starts the bot
-        
+
         Returns:
             bool: True if the bot started successfully
         """
@@ -118,9 +126,20 @@ class WhatsApp:
 
 
 class Chat:
-    def __init__(self, driver):
+    """Chat class that contains the chats informations and methods to interact with them
+
+    Args:
+        object (object): The object class
+        driver (webdriver): The webdriver
+
+    Attributes:
+        driver (webdriver): The webdriver
+    """
+
+    def __init__(self, driver: webdriver) -> None:
         self.driver = driver
         self._chats = []
+        return None
 
     def update(self) -> bool:
         """Updates the chat list
@@ -128,10 +147,10 @@ class Chat:
         Returns:
             bool: True if the chat list updated successfully, False otherwise
         """
-        
+
         def if_muted(element: WebElement) -> bool:
             """Checks if the chat is muted
-            
+
             Args:
                 element (WebElement): The chat element
 
@@ -275,10 +294,10 @@ class Chat:
 
     def add(self, chat: dict) -> None:
         """Adds a chat to the chat list
-        
+
         Args:
             chat (dict): The chat to be added
-            
+
         Returns:
             None
         """
@@ -380,11 +399,11 @@ class Chat:
 
     def listen_chats(self, corresponded: str, timeout: int = 43200) -> dict:
         """Listens to the chats until a chat with the corresponded message appears
-        
+
         Args:
             corresponded (str): The message to be listened
             timeout (int, optional): The time to listen. Defaults to 12h
-            
+
         Returns:
             dict: The chat with the corresponded message
         """
@@ -457,6 +476,14 @@ class Chat:
         return True
 
     def update_messages(self, chat: dict) -> bool:
+        """Updates the messages of a chat
+
+        Args:
+            chat (dict): The chat to update the messages
+
+        Returns:
+            bool: True if the messages were updated, False otherwise
+        """
         def is_audio(text: str) -> bool:
             pattern1 = r"\d{2}:\d{2}"
             pattern2 = r"\d{1}:\d{2}"
@@ -467,15 +494,6 @@ class Chat:
         def message_time(text: str) -> any:
             seconds = datetime.now().time().second
             return time(int(text.split(":")[0]), int(text.split(":")[1]), seconds)
-
-        def verify_time(time: datetime) -> bool:
-            time_chat = datetime.combine(
-                datetime.today(), chat['date_last_message'])
-            time_message = datetime.combine(datetime.today(), time)
-            seconds_difference = (time_chat - time_message)
-            if seconds_difference.seconds > 120:
-                return True
-            return False
 
         self.driver.execute_script(
             "arguments[0].scrollIntoView();", chat['id'])
@@ -507,7 +525,7 @@ class Chat:
 
     def mark_as_replied(self, chat: dict, message: dict) -> bool:
         """Marks a message as replied
-        
+
         Args:
             chat (dict): The chat that have the message to be marked as replied
             message (dict): The message to be marked as replied
@@ -523,7 +541,7 @@ class Chat:
 
     def if_exists_message(self, chat: dict, message_id: WebElement) -> bool:
         """Verifies if a message exists in a chat
-        
+
         Args:
             chat (dict): The chat to verify if the message exists
             message_id (WebElement): The message to be verified
@@ -541,7 +559,7 @@ class Chat:
         Args:
             chat (dict): The chat to add the message
             message (dict): The message to be added
-        
+
         Returns:
             None
         """
@@ -557,7 +575,7 @@ class Chat:
         """
         def delete_images() -> None:
             """Deletes the images in the downloads folder
-            
+
             Returns:
                 None
             """

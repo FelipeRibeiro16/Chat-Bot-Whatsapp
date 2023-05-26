@@ -10,7 +10,7 @@ print('Running...')
 corresponded = '/bot'
 while True:
     chat_atual = chat.listen_chats(corresponded)
-    message = chat.listen_messages(chat_atual, corresponded)
+    message = chat.last_message(chat_atual)
     if message is None:
         continue
     if f'{corresponded} sticker' in chat_atual['last_message']:
