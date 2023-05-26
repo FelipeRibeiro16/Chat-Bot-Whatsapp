@@ -1,5 +1,0 @@
-[14160:10764:0523/143052.040:WARNING:chrome_main_delegate.cc(589)] This is Chrome version 113.0.5672.127 (not a warning)
-[14160:10764:0523/143052.120:INFO:chrome_browser_cloud_management_controller.cc(167)] Starting CBCM Controller Initialization
-[14160:10764:0523/143052.120:INFO:chrome_browser_cloud_management_controller.cc(195)] No machine level policy manager exists.
-[14160:10764:0523/143052.755:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'.", source:  (0)
-[14160:10764:0523/143058.699:ERROR:device_event_log_impl.cc(222)] [14:30:58.699] USB: usb_service_win.cc:415 Could not read device interface GUIDs: O sistema não pode encontrar o arquivo especificado. (0x2)
