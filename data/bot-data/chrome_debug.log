@@ -1,9 +1,0 @@
-[12756:1484:0523/181425.790:WARNING:chrome_main_delegate.cc(589)] This is Chrome version 113.0.5672.127 (not a warning)
-[12756:1484:0523/181425.850:INFO:chrome_browser_cloud_management_controller.cc(167)] Starting CBCM Controller Initialization
-[12756:1484:0523/181425.850:INFO:chrome_browser_cloud_management_controller.cc(195)] No machine level policy manager exists.
-[12756:1484:0523/181426.419:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'.", source:  (0)
-[12756:1484:0523/181426.916:INFO:CONSOLE(1)] "Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Partial response (status code 206) is unsupported", source: https://web.whatsapp.com/serviceworker.js (1)
-[12756:1484:0523/181427.411:INFO:CONSOLE(1)] "Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Partial response (status code 206) is unsupported", source: https://web.whatsapp.com/serviceworker.js (1)
-[12756:1484:0523/181427.419:INFO:CONSOLE(1)] "Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Partial response (status code 206) is unsupported", source: https://web.whatsapp.com/serviceworker.js (1)
-[12756:1484:0523/181432.308:ERROR:device_event_log_impl.cc(222)] [18:14:32.306] USB: usb_service_win.cc:415 Could not read device interface GUIDs: O sistema não pode encontrar o arquivo especificado. (0x2)
-[12756:1484:0523/181446.521:WARNING:pref_notifier_impl.cc(41)] Pref observer for media_router.cast_allow_all_ips found at shutdown.
