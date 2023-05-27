@@ -1,5 +1,4 @@
 # %%
-import time
 from bot_modules import whatsapp
 from bot_modules import chat as chat_module
 wp = whatsapp()
@@ -26,21 +25,34 @@ corresponded = '/bot'
 if chat.listen_set_main_chat(f'{corresponded} principal'):
     print('Chat principal definido com sucesso!')
 main_chat = chat.main_chat
-start_time = time.time()
 chat.reply_message(main_chat, msg_bot('Bot', 'Olá! Estou pronto!'))
-
 print('Running...')
 while True:
-    start_time = time.time()
     chat_atual = chat.listen_chats(corresponded)
-    print("--- %s seconds ---" % (time.time() - start_time))
-    start_time = time.time()
     message = chat.last_message(chat_atual)
-    print("--- %s seconds ---" % (time.time() - start_time))
-    start_time = time.time()
     if not message:
         continue
-    if f'{corresponded} figurinha' in chat_atual['last_message']:
+    if f'{corresponded} adicionar' in chat_atual['last_message']:
+        chat.list_chats()
+        chat.reply_message(main_chat, msg_bot(
+            'Bot', 'Selecione o contato ou grupo?'))
+        chat.mark_as_replied(chat_atual, message)
+        chat_escolhido = chat.listen_messages(
+            main_chat, 'Selecione o contato ou grupo')['message']
+        if chat_escolhido in chat.title_of_chats.keys():
+            if chat.new_chat(chat.title_of_chats[chat_escolhido]):
+                chat.reply_message(main_chat, msg_bot(
+                    'Bot', 'Adicionado com sucesso!'))
+                chat.mark_as_replied(main_chat, message)
+            else:
+                chat.reply_message(main_chat, msg_bot(
+                    'Bot', 'Não foi possível adicionar!'))
+                chat.mark_as_replied(main_chat, message)
+        else:
+            chat.reply_message(main_chat, msg_bot(
+                'Bot', 'Contato ou grupo não encontrado!'))
+            chat.mark_as_replied(chat_atual, message)
+    elif f'{corresponded} figurinha' in chat_atual['last_message']:
         if chat.create_sticker():
             chat.reply_message(
                 chat_atual, msg_bot('Bot', 'Sticker criado com sucesso!'))
@@ -51,18 +63,18 @@ while True:
             chat.mark_as_replied(chat_atual, message)
     elif f'{corresponded} arquivar grupos' in chat_atual['last_message'] and chat.is_main_chat(chat_atual):
         chat.archive('groups')
-        if not chat_atual['is_group']:
-            chat.reply_message(
-                chat_atual, msg_bot('Bot', 'Grupos arquivados com sucesso!'))
-            chat.mark_as_replied(chat_atual, message)
+        chat.reply_message(
+            chat_atual, msg_bot('Bot', 'Grupos arquivados com sucesso!'))
+        chat.mark_as_replied(chat_atual, message)
     elif f'{corresponded} arquivar contatos' in chat_atual['last_message'] and chat.is_main_chat(chat_atual):
         chat.archive('chats')
-        if chat_atual['is_group']:
-            chat.reply_message(
-                chat_atual, msg_bot('Bot', 'Contatos arquivados com sucesso!'))
-            chat.mark_as_replied(chat_atual, message)
+        chat.reply_message(
+            chat_atual, msg_bot('Bot', 'Contatos arquivados com sucesso!'))
+        chat.mark_as_replied(chat_atual, message)
     elif f'{corresponded} arquivar' in chat_atual['last_message'] and chat.is_main_chat(chat_atual):
         chat.archive()
+        chat.reply_message(chat_atual, msg_bot(
+            'Bot', 'Conversas arquivadas com sucesso!'))
     elif f'{corresponded} sair' in chat_atual['last_message'] and chat.is_main_chat(chat_atual):
         chat.reply_message(chat_atual, msg_bot('Bot', 'Saindo...'))
         chat.mark_as_replied(chat_atual, message)
@@ -77,33 +89,7 @@ while True:
     else:
         chat.reply_message(chat_atual, msg_bot('Bot', 'Não entendi!'))
         chat.mark_as_replied(chat_atual, message)
-    print("--- %s seconds ---" % (time.time() - start_time))
+
 # %%
 wp.close()
-# %%
-chat.update()
-# %%
-chat.__set_main_chat(chat._chats[0])
-# %%
-chat_atual
-# %%
-chat._chats
-# %%
-chat.main_chat
-# %%
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.support import expected_conditions as EC
-try:
-    WebDriverWait(driver, 1).until(
-        EC.staleness_of(main_chat['id']))
-except TimeoutException:
-    print('TimeoutException')
-# %%
-main_chat
-# %%
-while True:
-    for chats_listening in chat._chats:
-        if corresponded in chats_listening['id'].text:
-            print(chats_listening['id'].text)
 # %%

@@ -9,7 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException, ElementNotVisibleException, ElementNotSelectableException, WebDriverException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 import os
@@ -139,15 +139,17 @@ class Chat:
     Args:
         object (object): The object class
         driver (webdriver): The webdriver
-
     Attributes:
         driver (webdriver): The webdriver
+        chats (list): The list of chats
+        main_chat (dict): The main chat
     """
 
     def __init__(self, driver: webdriver) -> None:
         self.driver: webdriver = driver
-        self._chats: list = []
+        self.chats: list = []
         self.main_chat: dict = None
+        self.__title_of_chats: dict = {}
         return None
 
     def is_main_chat(self, chat: dict) -> bool:
@@ -220,7 +222,7 @@ class Chat:
             return text[4].lower()
         return text[2].lower()
 
-    def __chat_last_message_time(self, text: str) -> datetime.time:
+    def __chat_last___message_time(self, text: str) -> datetime.time:
         """Gets the last message time
         Args:
             text (str): The chat message time text
@@ -228,7 +230,7 @@ class Chat:
             datetime.time: The last message time
         """
         seconds = datetime.now().time().second
-        if self.verify_last_message(text):
+        if self.__verify_last_message(text):
             return time(int(text.split(":")[0]), int(
                 text.split(":")[1]), seconds)
         return text
@@ -240,14 +242,14 @@ class Chat:
             bool: True if the chat list updated successfully, False otherwise
         """
         try:
-            for chat in self._chats:
+            for chat in self.chats:
                 raw_text = chat['id'].text
                 chats_text = raw_text.split("\n")
                 chat['raw_text'] = raw_text
                 chat['silenced'] = self.__if_muted(chat['id'])
                 chat['unread_messages'] = self.__unread_messages(chats_text)
                 chat['last_message'] = self.__chat_last_message(chats_text)
-                chat['date_last_message'] = self.__chat_last_message_time(
+                chat['date_last_message'] = self.__chat_last___message_time(
                     chats_text[1])
             return True
         except:
@@ -269,6 +271,8 @@ class Chat:
         Returns:
             bool: True if the chat was created successfully, False otherwise
         """
+        if self.if_exists(chat_title) and not main:
+            return False
         chats_open = self.driver.find_elements(By.XPATH,
                                                """
                                                 //div[@data-testid="cell-frame-container"]
@@ -293,7 +297,7 @@ class Chat:
                 'silenced': self.__if_muted(chat_open),
                 'unread_messages': self.__unread_messages(chats_text),
                 'last_message': self.__chat_last_message(chats_text),
-                'date_last_message': self.__chat_last_message_time(chats_text[1]),
+                'date_last_message': self.__chat_last___message_time(chats_text[1]),
                 'messages': []
             }
             if self.add(new):
@@ -307,24 +311,24 @@ class Chat:
                 'silenced': self.__if_muted(chat_open),
                 'unread_messages': self.__unread_messages(chats_text),
                 'last_message': self.__chat_last_message(chats_text),
-                'date_last_message': self.__chat_last_message_time(chats_text[1]),
+                'date_last_message': self.__chat_last___message_time(chats_text[1]),
                 'messages': []
             }
             self.main_chat = new
             return True
         return False
 
-    def return_messages(self, id_chat: WebElement) -> list[str]:
+    def return_messages(self, title: str) -> list[str]:
         """Returns the messages of a chat
 
         Args:
-            id_chat (WebElement): The chat element
+            title (str): The chat title
 
         Returns:
             list: The messages of the chat
         """
-        for chats in self._chats:
-            if chats['id'] == id_chat:
+        for chats in self.chats:
+            if chats['title'] == title:
                 return chats['messages']
         return []
 
@@ -338,7 +342,7 @@ class Chat:
             None
         """
         if not self.if_exists(chat['title']):
-            self._chats.append(chat)
+            self.chats.append(chat)
             return True
         return False
 
@@ -351,8 +355,8 @@ class Chat:
         Returns:
             bool: True if the chat exists, False otherwise
         """
-        for chat in self._chats:
-            if chat['title'] == chat_title:
+        for chat in self.chats:
+            if chat['title'] in chat_title:
                 return True
         return False
 
@@ -366,7 +370,7 @@ class Chat:
             None
         """
         if self.if_exists(chat['title']):
-            self._chats.remove(chat)
+            self.chats.remove(chat)
         return None
 
     def reset(self) -> None:
@@ -375,7 +379,7 @@ class Chat:
         Returns:
             None
         """
-        self._chats = []
+        self.chats = []
         return None
 
     def display(self, by: str = None) -> None:
@@ -388,23 +392,25 @@ class Chat:
             None
         """
         def __display_groups() -> None:
-            for chat in self._chats:
+            for chat in self.chats:
                 if chat['is_group']:
                     windows = f"{chat['title']}{' Silenciado' if chat['silenced'] else ''}\nUltima mensagem: {chat['last_message']}, {chat['date_last_message']}\n"
-                    print(windows)
+                    self.reply_message(
+                        self.main_chat, self.__clean_text(windows))
             return None
 
         def __display_chats() -> None:
-            for chat in self._chats:
+            for chat in self.chats:
                 if not chat['is_group']:
                     windows = f"{chat['title']}{' Silenciado' if chat['silenced'] else ''}\nUltima mensagem: {chat['last_message']}, {chat['date_last_message']}\n"
-                    print(windows)
+                    self.reply_message(
+                        self.main_chat, self.__clean_text(windows))
             return None
 
         def __display_all() -> None:
-            for chat in self._chats:
+            for chat in self.chats:
                 windows = f"{chat['title']}{' Silenciado' if chat['silenced'] else ''}\nUltima mensagem: {chat['last_message']}, {chat['date_last_message']}\n"
-                print(windows)
+                self.reply_message(self.main_chat, self.__clean_text(windows))
             return None
         if by == "groups":
             return __display_groups()
@@ -412,7 +418,7 @@ class Chat:
             return __display_chats()
         return __display_all()
 
-    def verify_last_message(self, last_message: str) -> bool:
+    def __verify_last_message(self, last_message: str) -> bool:
         """Verifies if the last message is a time
 
         Args:
@@ -474,10 +480,12 @@ class Chat:
         self.update()
         while True:
             try:
-                for chats_listening in self._chats:
+                for chats_listening in self.chats:
                     if corresponded in chats_listening['id'].text:
                         self.update()
                         return chats_listening
+                else:
+                    sleep(0.5)
             except:
                 self.update()
 
@@ -520,6 +528,68 @@ class Chat:
                     return True
             return False
 
+    def list_chats(self) -> None:
+        """Lists all chats open in the main chat
+
+        Returns:
+            None
+        """
+        list_of_chats = self.driver.find_elements(By.XPATH,
+                                                  """
+                                                    .//div[@data-testid="cell-frame-title"]/span[1]
+                                                    """)
+        for i, chats in enumerate(list_of_chats):
+            self.__title_of_chats[f'{i+1}'] = chats.get_attribute("title")
+        message_list = "Chats:\n"
+        for key, value in self.__title_of_chats.items():
+            message_list += f"{key} - {value}\n"
+        self.reply_message(self.main_chat, self.__clean_text(message_list))
+        return None
+
+    def __clean_text(self, text: str) -> str:
+        """Cleans the text
+
+        Args:
+            text (str): The text to be cleaned
+
+        Returns:
+            str: The text cleaned
+        """
+        return re.sub(r'[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0001F6FF\U0001F1E0-\U0001F1FF]+', '', text)
+
+    def listen_messages(self, chat: dict, corresponded: str, timeout: int = 43200) -> dict:
+        """Listens to a chat until a message appears
+
+        Args:
+            chat (dict): The chat to be listened
+            corresponded (str): The message to be ignored
+            timeout (int, optional): The time between each listen. Defaults to 12h.
+
+        Returns:
+            dict: The chat with the message
+        """
+        while True:
+            self.driver.execute_script(
+                "arguments[0].scrollIntoView();", chat['id'])
+            chat['id'].click()
+            try:
+                WebDriverWait(self.driver, 5).until(EC.text_to_be_present_in_element((By.XPATH,
+                                                                                      """
+                                                                                    //span[@data-testid='conversation-info-header-chat-title']
+                                                                                    """), chat['title'].strip()))
+            except TimeoutException:
+                return None
+            else:
+                message_box = self.driver.find_element(By.XPATH,
+                                                       """
+                                                          (//div[@role="application"]/div[@role="row"])[last()]
+                                                          """)
+                if corresponded not in message_box.text:
+                    self.update_messages(chat)
+                    for message in chat['messages']:
+                        if not message['replied']:
+                            return message
+
     def last_message(self, chat: dict) -> dict:
         """Returns the last message of a chat
 
@@ -531,13 +601,11 @@ class Chat:
         """
         self.update_messages(chat)
         while True:
-            if chat['messages'] is None:
-                return {}
             for message in chat['messages']:
                 if not message['replied']:
                     return message
             else:
-                return {}
+                self.update_messages(chat)
 
     def reply_message(self, chat: dict, reply: str) -> bool:
         """Replies a message in a chat
@@ -551,7 +619,6 @@ class Chat:
         """
         self.driver.execute_script(
             "arguments[0].scrollIntoView();", chat['id'])
-        actionChains = ActionChains(self.driver)
         chat['id'].click()
         try:
             WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.XPATH,
@@ -579,46 +646,62 @@ class Chat:
         Returns:
             bool: True if the messages were updated, False otherwise
         """
-        if chat is None:
-            return False
 
-        def is_audio(text: str) -> bool:
+        def __is_audio(text: str) -> bool:
+            """Checks if the message is an audio
+
+            Args:
+                text (str): The text of the message
+
+            Returns:
+                bool: True if the message is an audio, False otherwise
+            """
             pattern1 = r"\d{2}:\d{2}"
             pattern2 = r"\d{1}:\d{2}"
             if re.fullmatch(pattern1, text) or re.fullmatch(pattern2, text):
                 return True
             return False
 
-        def message_time(text: str) -> any:
+        def __message_time(text: str) -> datetime.time:
+            """Returns the time of the message
+
+            Args:
+                text (str): The text of the message
+
+            Returns:
+                datetime.time: The time of the message
+            """
             seconds = datetime.now().time().second
             return time(int(text.split(":")[0]), int(text.split(":")[1]), seconds)
 
         self.driver.execute_script(
             "arguments[0].scrollIntoView();", chat['id'])
-        actionChains = ActionChains(self.driver)
-        actionChains.double_click(chat['id']).perform()
+        chat['id'].click()
+
         try:
             WebDriverWait(self.driver, 5).until(EC.text_to_be_present_in_element((By.XPATH,
                                                                                   """
                                                                                 //span[@data-testid='conversation-info-header-chat-title']
-                                                                                """), chat['title']))
+                                                                                """), chat['title'].strip()))
         except TimeoutException:
             return False
-        finally:
-            message_boxes = self.driver.find_elements(By.XPATH,
-                                                      """
-                                     //div[@data-testid='msg-container']
-                                     """
-                                                      )
-            message_box = message_boxes[-1]
-            messages = {}
+        else:
+
+            message_box = self.driver.find_element(By.XPATH,
+                                                   """
+                                                      (//div[@role="application"]/div[@role="row"])[last()]
+                                                      """)
+
             text = message_box.text.split("\n")
-            messages['time'] = message_time(text[1])
-            messages['id'] = message_box.text
-            messages['message'] = 'audio' if is_audio(
-                text[0]) else text[0].lower()
-            messages['replied'] = False
+            messages = {
+                'time': __message_time(text[1]),
+                'message': 'audio' if __is_audio(
+                    text[0]) else text[0].lower(),
+                'replied': False,
+                'id': datetime.now().strftime("%Y%m%d%H%M%S%f")
+            }
             self.add_message(chat, messages)
+
             return True
 
     def mark_as_replied(self, chat: dict, message: dict) -> bool:
@@ -661,8 +744,7 @@ class Chat:
         Returns:
             None
         """
-        if not self.if_exists_message(chat, message['id']):
-            chat['messages'].append(message)
+        chat['messages'].append(message)
         return None
 
     def create_sticker(self) -> bool:
@@ -671,7 +753,7 @@ class Chat:
         Returns:
             bool: True if the sticker was created, False otherwise
         """
-        def delete_images() -> None:
+        def __delete_images() -> None:
             """Deletes the images in the downloads folder
 
             Returns:
@@ -711,7 +793,7 @@ class Chat:
                                                                                 //span[@data-testid='x-viewer']
                                                                                 """)))
         except TimeoutException:
-            delete_images()
+            __delete_images()
             return False
         else:
             self.driver.find_element(By.XPATH,
@@ -725,7 +807,7 @@ class Chat:
                                                                                 //span[@data-testid='clip']
                                                                                 """)))
         except TimeoutException:
-            delete_images()
+            __delete_images()
             return False
         else:
             self.driver.find_element(By.XPATH,
@@ -739,7 +821,7 @@ class Chat:
                                                                                 //input[@accept='image/*']
                                                                                 """)))
         except TimeoutException:
-            delete_images()
+            __delete_images()
             return False
         else:
             self.driver.find_element(By.XPATH,
@@ -753,7 +835,7 @@ class Chat:
                                                                                 //span[@data-testid='send']
                                                                                 """)))
         except TimeoutException:
-            delete_images()
+            __delete_images()
             return False
         else:
             self.driver.find_element(By.XPATH,
@@ -762,7 +844,7 @@ class Chat:
                                      """
                                      ).click()
         sleep(1)
-        delete_images()
+        __delete_images()
         return True
 
     def archive(self, by: str = None) -> None:
@@ -774,70 +856,44 @@ class Chat:
         Returns:
             None
         """
-        def __to_archive(chat: dict) -> None:
-            rigth_click = chat['id']
-            self.driver.execute_script(
-                "arguments[0].scrollIntoView();", rigth_click)
-            actionChains = ActionChains(self.driver)
-            actionChains.context_click(rigth_click).perform()
-            try:
-                WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable(
-                    (By.XPATH,
-                        """
-                        //li[@data-testid='mi-archive']
-                        """
-                     )))
-            except TimeoutException:
-                return None
+        while True:
+            chats_open = self.driver.find_elements(By.XPATH,
+                                                   """
+                                                //div[@data-testid="cell-frame-container"]
+                                                """)
+            for chat_open in chats_open:
+                chat_active_title = chat_open.find_element(By.XPATH,
+                                                           f"""
+                                                                 .//div[@data-testid="cell-frame-title"]/span[1]
+                                                                 """).get_attribute("title")
+                if by == 'groups':
+                    by_choose = self.__is_group(chat_open.text.split('\n'))
+                elif by == 'chats':
+                    by_choose = not self.__is_group(chat_open.text.split('\n'))
+                else:
+                    by_choose = True
+                if not self.if_exists(chat_active_title) and by_choose:
+                    self.driver.execute_script(
+                        "arguments[0].scrollIntoView();", chat_open)
+                    actionChains = ActionChains(self.driver)
+                    actionChains.context_click(chat_open).perform()
+                    try:
+                        WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable(
+                            (By.XPATH,
+                                """
+                                //li[@data-testid='mi-archive']
+                                """
+                             )))
+                    except TimeoutException:
+                        return None
+                    else:
+                        self.driver.find_element(By.XPATH,
+                                                 """
+                                             //li[@data-testid='mi-archive']
+                                             """
+                                                 ).click()
+                        sleep(1)
+                        break
             else:
-                self.driver.find_element(By.XPATH,
-                                         """
-                                         //li[@data-testid='mi-archive']
-                                         """
-                                         ).click()
-            self.remove_chat(chat)
-            return None
-
-        def __archive_groups() -> None:
-            """Archives the groups
-
-            Returns:
-                None
-            """
-            for chat in self._chats:
-                if chat['is_group'] and not self.is_main_chat(chat):
-                    __to_archive(chat)
-                    sleep(1)
-            return None
-
-        def __archive_chats() -> None:
-            """Archives the chats
-
-            Returns:
-                None
-            """
-            for chat in self._chats:
-                if not chat['is_group'] and not self.is_main_chat(chat):
-                    __to_archive(chat)
-                    sleep(1)
-            return None
-
-        def __archive_all() -> None:
-            """Archives all the chats
-
-            Returns:
-                None
-            """
-            for chat in self._chats:
-                if chat:
-                    __to_archive(chat)
-                    sleep(1)
-            return None
-        if by == "groups":
-            return __archive_groups()
-        if by == "chats":
-            return __archive_chats()
-        if by is None:
-            return __archive_all()
-        return None
+                return None
 # %%
