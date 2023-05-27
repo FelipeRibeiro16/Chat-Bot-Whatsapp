@@ -42,7 +42,7 @@ class WhatsApp:
             bool: True if the bot started successfully
         """
         chrome_options = Options()
-        # chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--headless")
         chrome_options.add_argument('window-size=1920x2160')
         chrome_options.add_experimental_option(
             'excludeSwitches', ['enable-logging'])
