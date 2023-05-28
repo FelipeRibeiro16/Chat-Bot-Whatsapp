@@ -1,24 +1,26 @@
 # %%
 from datetime import datetime, time
 import glob
+import os
+import io
+import qrcode
+from pyzbar.pyzbar import decode
+from PIL import Image
+import re
+from time import sleep
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.remote.webelement import WebElement
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver import ActionChains
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
-import os
-from time import sleep
-import io
-import qrcode
-from pyzbar.pyzbar import decode
-from PIL import Image
-import re
+
+
 os.environ['WDM_LOCAL'] = '1'
 
 
@@ -33,16 +35,16 @@ class WhatsApp:
     """
 
     def __init__(self) -> None:
-        return None
+        self.driver = None
 
-    def start(self) -> bool:
+    def start(self) -> None:
         """Starts the bot
 
         Returns:
             bool: True if the bot started successfully
         """
         chrome_options = Options()
-        chrome_options.add_argument("--headless")
+        # chrome_options.add_argument("--headless")
         chrome_options.add_argument('window-size=1920x2160')
         chrome_options.add_experimental_option(
             'excludeSwitches', ['enable-logging'])
@@ -71,10 +73,9 @@ class WhatsApp:
         self.driver.execute_script(
             "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
         self.driver.get("https://web.whatsapp.com/")
+        self.__autentication()
 
-        return self.__autentication()
-
-    def __autentication(self) -> bool:
+    def __autentication(self) -> None:
         """Authenticates the bot
 
         Returns:
@@ -95,34 +96,34 @@ class WhatsApp:
                 WebDriverWait(self.driver, 2).until(EC.presence_of_element_located(
                     (By.CSS_SELECTOR, "#app > div > div > div.landing-window > div.landing-main > div > div > div._2I5ox > div > canvas")))
             except TimeoutException:
-                return True
+                return None
             try:
-                qr_code_element = self.driver.find_element(By.
-                                                           CSS_SELECTOR,
-                                                           """
-                                #app > div > div > div.landing-window > div.landing-main > div > div > div._2I5ox > div > canvas
-                                """)
+                if self.driver is not None:
+                    qr_code_element = self.driver.find_element(By.
+                                                               CSS_SELECTOR,
+                                                               """
+                                    #app > div > div > div.landing-window > div.landing-main > div > div > div._2I5ox > div > canvas
+                                    """)
+                    screenshot = qr_code_element.screenshot_as_png
+                    image = Image.open(io.BytesIO(screenshot))
+                    qr_code_data = decode(image)
+                    qr_code_text = qr_code_data[0].data.decode("utf-8")
+                    qr_code = qrcode.QRCode()
+                    qr_code.add_data(qr_code_text)
+                    f = io.StringIO()
+                    qr_code.print_ascii(out=f)
+                    f.seek(0)
+                    os.system('cls')
+                    print(f.read())
             except NoSuchElementException:
                 pass
-            else:
-                screenshot = qr_code_element.screenshot_as_png
-                image = Image.open(io.BytesIO(screenshot))
-                qr_code_data = decode(image)
-                qr_code_text = qr_code_data[0].data.decode("utf-8")
-                qr_code = qrcode.QRCode()
-                qr_code.add_data(qr_code_text)
-                f = io.StringIO()
-                qr_code.print_ascii(out=f)
-                f.seek(0)
-                os.system('cls')
-                print(f.read())
             try:
                 WebDriverWait(self.driver, 60).until(EC.presence_of_element_located(
                     (By.CSS_SELECTOR, "#app > div > div > div._2Ts6i._3RGKj")))
             except TimeoutException:
-                self.__autentication()
+                return self.__autentication()
             else:
-                return True
+                return None
 
     def close(self) -> None:
         """Closes the bot
@@ -130,7 +131,8 @@ class WhatsApp:
         Returns:
             None
         """
-        self.driver.close()
+        if self.driver is not None:
+            self.driver.close()
 
 
 class Chat:
@@ -143,13 +145,14 @@ class Chat:
         driver (webdriver): The webdriver
         chats (list): The list of chats
         main_chat (dict): The main chat
+        title_of_chats (dict): The dictionary of the chats titles
     """
 
-    def __init__(self, driver: webdriver) -> None:
-        self.driver: webdriver = driver
+    def __init__(self, driver) -> None:
+        self.driver = driver
         self.chats: list = []
-        self.main_chat: dict = None
-        self.__title_of_chats: dict = {}
+        self.main_chat: dict
+        self.title_of_chats: dict = {}
         return None
 
     def is_main_chat(self, chat: dict) -> bool:
@@ -161,9 +164,7 @@ class Chat:
         Returns:
             bool: True if the chat is the main chat, False otherwise
         """
-        if chat['title'] == self.main_chat['title']:
-            return True
-        return False
+        return chat['title'] == self.main_chat['title']
 
     def __main_chat_is_set(self) -> bool:
         """Checks if the main chat is set
@@ -171,9 +172,7 @@ class Chat:
         Returns:
             bool: True if the main chat is set, False otherwise
         """
-        if self.main_chat:
-            return True
-        return False
+        return bool(self.main_chat)
 
     def __if_muted(self, element: WebElement) -> bool:
         """Checks if the chat is muted
@@ -182,11 +181,9 @@ class Chat:
         Returns:
             bool: True if the chat is muted, False otherwise
         """
-        if element.find_elements(By.XPATH, """
-        *//span[@data-testid="muted"]
-        """):
-            return True
-        return False
+        return bool(element.find_elements(By.XPATH, """
+        .//span[@data-testid="muted"]
+        """))
 
     def __is_group(self, text: list[str]) -> bool:
         """Checks if the chat is a group
@@ -195,9 +192,7 @@ class Chat:
         Returns:
             bool: True if the chat is a group, False otherwise
         """
-        if len(text) > 4:
-            return True
-        return False
+        return len(text) > 4
 
     def __unread_messages(self, text: list[str]) -> int:
         """Gets the number of unread messages
@@ -218,16 +213,14 @@ class Chat:
         Returns:
             str: The last message
         """
-        if self.__is_group(text):
-            return text[4].lower()
-        return text[2].lower()
+        return text[4].lower() if self.__is_group(text) else text[2].lower()
 
-    def __chat_last___message_time(self, text: str) -> datetime.time:
+    def __chat_last_message_time(self, text: str) -> time | str:
         """Gets the last message time
         Args:
             text (str): The chat message time text
         Returns:
-            datetime.time: The last message time
+            time: The last message time
         """
         seconds = datetime.now().time().second
         if self.__verify_last_message(text):
@@ -249,7 +242,7 @@ class Chat:
                 chat['silenced'] = self.__if_muted(chat['id'])
                 chat['unread_messages'] = self.__unread_messages(chats_text)
                 chat['last_message'] = self.__chat_last_message(chats_text)
-                chat['date_last_message'] = self.__chat_last___message_time(
+                chat['date_last_message'] = self.__chat_last_message_time(
                     chats_text[1])
             return True
         except:
@@ -288,33 +281,20 @@ class Chat:
             return False
         raw_text = chat_open.text
         chats_text = raw_text.split("\n")
-        if not main:
-            new = {
-                'id': chat_open,
-                'raw_text': raw_text,
-                'title': chat_active_title,
-                'is_group': self.__is_group(chats_text),
-                'silenced': self.__if_muted(chat_open),
-                'unread_messages': self.__unread_messages(chats_text),
-                'last_message': self.__chat_last_message(chats_text),
-                'date_last_message': self.__chat_last___message_time(chats_text[1]),
-                'messages': []
-            }
-            if self.add(new):
-                return True
-        else:
-            new = {
-                'id': chat_open,
-                'raw_text': raw_text,
-                'title': chat_active_title,
-                'is_group': self.__is_group(chats_text),
-                'silenced': self.__if_muted(chat_open),
-                'unread_messages': self.__unread_messages(chats_text),
-                'last_message': self.__chat_last_message(chats_text),
-                'date_last_message': self.__chat_last___message_time(chats_text[1]),
-                'messages': []
-            }
+        new = {
+            'id': chat_open,
+            'raw_text': raw_text,
+            'title': chat_active_title,
+            'is_group': self.__is_group(chats_text),
+            'silenced': self.__if_muted(chat_open),
+            'unread_messages': self.__unread_messages(chats_text),
+            'last_message': self.__chat_last_message(chats_text),
+            'date_last_message': self.__chat_last_message_time(chats_text[1]),
+            'messages': []
+        }
+        if main:
             self.main_chat = new
+        if self.add(new):
             return True
         return False
 
@@ -327,10 +307,7 @@ class Chat:
         Returns:
             list: The messages of the chat
         """
-        for chats in self.chats:
-            if chats['title'] == title:
-                return chats['messages']
-        return []
+        return [chats['messages'] for chats in self.chats if chats['title'] == title]
 
     def add(self, chat: dict) -> bool:
         """Adds a chat to the chat list
@@ -371,7 +348,6 @@ class Chat:
         """
         if self.if_exists(chat['title']):
             self.chats.remove(chat)
-        return None
 
     def reset(self) -> None:
         """Resets the chat list
@@ -380,9 +356,8 @@ class Chat:
             None
         """
         self.chats = []
-        return None
 
-    def display(self, by: str = None) -> None:
+    def display(self, by: str = '') -> None:
         """Displays the chat list
 
         Args:
@@ -392,26 +367,39 @@ class Chat:
             None
         """
         def __display_groups() -> None:
+            """Displays the groups in the chat list
+
+            Returns:
+                None
+            """
             for chat in self.chats:
                 if chat['is_group']:
                     windows = f"{chat['title']}{' Silenciado' if chat['silenced'] else ''}\nUltima mensagem: {chat['last_message']}, {chat['date_last_message']}\n"
                     self.reply_message(
                         self.main_chat, self.__clean_text(windows))
-            return None
 
         def __display_chats() -> None:
+            """Displays the chats there are not groups in the chat list
+
+            Returns:
+                None
+            """
             for chat in self.chats:
                 if not chat['is_group']:
                     windows = f"{chat['title']}{' Silenciado' if chat['silenced'] else ''}\nUltima mensagem: {chat['last_message']}, {chat['date_last_message']}\n"
                     self.reply_message(
                         self.main_chat, self.__clean_text(windows))
-            return None
 
         def __display_all() -> None:
+            """Displays all the chats in the chat list
+
+            Returns:
+                None
+            """
             for chat in self.chats:
                 windows = f"{chat['title']}{' Silenciado' if chat['silenced'] else ''}\nUltima mensagem: {chat['last_message']}, {chat['date_last_message']}\n"
                 self.reply_message(self.main_chat, self.__clean_text(windows))
-            return None
+
         if by == "groups":
             return __display_groups()
         if by == "chats":
@@ -428,9 +416,7 @@ class Chat:
             bool: True if the last message is a time, False otherwise
         """
         pattern = r"\d{2}:\d{2}"
-        if re.fullmatch(pattern, last_message):
-            return True
-        return False
+        return bool(re.fullmatch(pattern, last_message))
 
     def main_chat_is_present(self, warning: str = "Maintain the main chat unarchived") -> bool:
         """Checks if the main chat is present
@@ -462,7 +448,7 @@ class Chat:
                 message_box.send_keys(Keys.ENTER)
                 sleep(1)
                 self.new_chat(self.main_chat['title'], main=True)
-                self.new_chat(self.main_chat['title'])
+                return True
             except NoSuchElementException:
                 return False
 
@@ -522,8 +508,9 @@ class Chat:
                                                              """).get_attribute("title")
                     break
             else:
-                return self.listen_chats(corresponded, timeout)
-            if self.new_chat(chat_open_title, main=True) and self.new_chat(chat_open_title):
+                self.listen_chats(corresponded)
+                return True
+            if self.new_chat(chat_open_title, main=True):
                 if self.__main_chat_is_set():
                     return True
             return False
@@ -539,12 +526,11 @@ class Chat:
                                                     .//div[@data-testid="cell-frame-title"]/span[1]
                                                     """)
         for i, chats in enumerate(list_of_chats):
-            self.__title_of_chats[f'{i+1}'] = chats.get_attribute("title")
+            self.title_of_chats[f'{i+1}'] = chats.get_attribute("title")
         message_list = "Chats:\n"
-        for key, value in self.__title_of_chats.items():
+        for key, value in self.title_of_chats.items():
             message_list += f"{key} - {value}\n"
         self.reply_message(self.main_chat, self.__clean_text(message_list))
-        return None
 
     def __clean_text(self, text: str) -> str:
         """Cleans the text
@@ -578,7 +564,7 @@ class Chat:
                                                                                     //span[@data-testid='conversation-info-header-chat-title']
                                                                                     """), chat['title'].strip()))
             except TimeoutException:
-                return None
+                return {}
             else:
                 message_box = self.driver.find_element(By.XPATH,
                                                        """
@@ -589,6 +575,55 @@ class Chat:
                     for message in chat['messages']:
                         if not message['replied']:
                             return message
+
+    def extract_messages(self, chat_title: str) -> None:
+        """Extracts messages of a chat and save them in a .csv file 
+        Args:
+            chat_title (str): The chat to be extracted
+        Returns:
+            None
+        """
+        chats_open = self.driver.find_elements(By.XPATH,
+                                               """
+                                                //div[@data-testid="cell-frame-container"]
+                                                """)
+        for chat_open in chats_open:
+            chat_active_title = chat_open.find_element(By.XPATH,
+                                                       f"""
+                                                             .//div[@data-testid="cell-frame-title"]/span[1]
+                                                             """).get_attribute("title")
+            if chat_title in chat_active_title:
+                break
+        chat_open.click()
+        sleep(1)
+        self.driver.execute_script(
+            "document.querySelector('[role=application]').scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });")
+        sleep(0.5)
+        message_boxes = self.driver.find_elements(By.XPATH,
+                                                  """
+                       //div[@data-testid="msg-container"]
+                       """)
+        message_text = 'name;from;message\n'
+        name = ''
+        for message_box in message_boxes:
+            try:
+                self.driver.execute_script(
+                    "arguments[0].scrollIntoView();", message_box)
+                element = message_box.find_element(
+                    By.CLASS_NAME, 'copyable-text')
+                try:
+                    name = message_box.find_element(
+                        By.XPATH, './div[2]/div[1]/div[1]/span[1]').text
+                except NoSuchElementException:
+                    name = ''
+                msg_from = element.get_attribute(
+                    'data-pre-plain-text').replace('\n', '\t')
+                msg = element.text.replace('\n', '\t')
+                message_text += f"""{name};{msg_from};{msg}\n"""
+            except NoSuchElementException:
+                pass
+        with open(f'{os.getcwd()}\\data\\messages\\messages_extracted.csv', 'w', encoding='utf-8') as f:
+            f.write(message_text)
 
     def last_message(self, chat: dict) -> dict:
         """Returns the last message of a chat
@@ -662,14 +697,14 @@ class Chat:
                 return True
             return False
 
-        def __message_time(text: str) -> datetime.time:
+        def __message_time(text: str) -> time:
             """Returns the time of the message
 
             Args:
                 text (str): The text of the message
 
             Returns:
-                datetime.time: The time of the message
+                time: The time of the message
             """
             seconds = datetime.now().time().second
             return time(int(text.split(":")[0]), int(text.split(":")[1]), seconds)
@@ -720,19 +755,16 @@ class Chat:
             return True
         return False
 
-    def if_exists_message(self, chat: dict, message_id: WebElement) -> bool:
+    def if_exists_message(self, chat: dict, message_id: datetime) -> bool:
         """Verifies if a message exists in a chat
 
         Args:
             chat (dict): The chat to verify if the message exists
-            message_id (WebElement): The message to be verified
+            message_id (datetime): The id of the message to be verified
         Returns:
             bool: True if the message exists, False otherwise
         """
-        ids_chat = [elements['id'] for elements in chat['messages']]
-        if message_id in ids_chat:
-            return True
-        return False
+        return bool([elements['id'] for elements in chat['messages'] if elements['id'] == message_id])
 
     def add_message(self, chat: dict, message: dict) -> None:
         """Adds a message in a chat
@@ -745,7 +777,6 @@ class Chat:
             None
         """
         chat['messages'].append(message)
-        return None
 
     def create_sticker(self) -> bool:
         """Creates a sticker from the last image in the chat
@@ -762,7 +793,7 @@ class Chat:
             images = glob.glob(f"{os.getcwd()}\\data\\downloads\\*.jpeg")
             for image in images:
                 os.remove(image)
-            return None
+
         elements = self.driver.find_elements(By.XPATH,
                                              """
                                                 //div[@data-testid="media-url-provider"]
@@ -847,7 +878,7 @@ class Chat:
         __delete_images()
         return True
 
-    def archive(self, by: str = None) -> None:
+    def archive(self, by: str = '') -> None:
         """Archives the chats
 
         Args:

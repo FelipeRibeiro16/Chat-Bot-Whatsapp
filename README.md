@@ -15,22 +15,22 @@ To use the project you must run the main.py file with the command:
 ```bash
 python main.py
 ```
-Then you must scan the QR code that appears in the CMD and that's it, you can use the bot on any chat in WhatsApp.
-
+Then you must scan the QR code that appears in the CMD, after that the bot will display the message "Define main chat...", which means that you have to define the main chat by sending a message to the chat you want to be the main chat with command setting in the method `listen_set_main_chat(command)`, beware that after set the main chat cannot be changed until the bot is restarted, and may be dangerous to set a main chat that others can send messages, so choose wisely. After that the bot will display the message "'Main chat defined!". Then the bot will be ready to use.
 ## Commands
-The commands of the bot need to be written with the prefix "/bot", for example:
+The commands of the bot need to be written with the prefix "/bot"(this can be changed in the main.py file), for example:
 ```bash
 /bot oi
 ```
 The commands are:
 - oi: The bot will respond with "Olá, tudo bem?".
-- sair: The bot will respond with "Saindo!" and will stop running.
-- sticker: The bot will create a sticker with the last image sent in the chat.
-- arquivar: The bot will archive all chats.
-- arquivar grupo: The bot will archive all groups chats.
-- arquivar chats: The bot will archive all chats there are not groups.
+- adicionar: The bot will list the chats there are unarchived and you must choose one of them to add to the list of chats that the bot will listen to. To choose a chat you must send the number of the chat, listed by the bot, after that the bot will respond with "Adicionado com sucesso!", in case of error the bot will respond with "Não foi possível adicionar!" (Only available in the main chat).
+- sair: The bot will respond with "Saindo!" and will stop running (Only available in the main chat).
+- figurinha: The bot will create a sticker with the last image sent in the chat.
+- arquivar: The bot will archive all chats (Only available in the main chat).
+- arquivar grupo: The bot will archive all groups chats (Only available in the main chat).
+- arquivar chats: The bot will archive all chats there are not groups (Only available in the main chat).
 
-and if you send a message with the prefix "/bot" and the bot does not recognize the command, it will respond with "Não entendi".
+And if you send a message with the prefix "/bot" and the bot does not recognize the command or was send in a chat without permissions, it will respond with "Não entendi".
 
 ## Files and folders
 - The main.py file uses the modules of the project to run the bot.
@@ -49,6 +49,8 @@ The modules of the project are:
 - [X] Archive all chats.
 - [X] Archive all groups chats.
 - [X] Archive all chats there are not groups.
+- [ ] Resume messages.
+- [ ] Integration with ChatGPT.
 - [ ] Create a sticker with the last video sent in the chat.
 - [ ] Create a sticker with the last gif sent in the chat.
 

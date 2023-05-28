@@ -22,8 +22,9 @@ def msg_bot(bot_name: str, message: str) -> str:
 
 # %%
 corresponded = '/bot'
+print('Define main chat...')
 if chat.listen_set_main_chat(f'{corresponded} principal'):
-    print('Chat principal definido com sucesso!')
+    print('Main chat defined!')
 main_chat = chat.main_chat
 chat.reply_message(main_chat, msg_bot('Bot', 'Olá! Estou pronto!'))
 print('Running...')
@@ -32,6 +33,23 @@ while True:
     message = chat.last_message(chat_atual)
     if not message:
         continue
+    if f'{corresponded} resumir' in chat_atual['last_message'] and chat.is_main_chat(chat_atual):
+        chat.list_chats()
+        chat.reply_message(chat_atual, msg_bot(
+            'Bot', 'Qual chat você deseja resumir?'))
+        chat.mark_as_replied(chat_atual, message)
+        chat_escolhido = chat.listen_messages(
+            main_chat, 'Qual chat você deseja resumir?')
+        if chat_escolhido['message'] in chat.title_of_chats.keys():
+            chat.reply_message(chat_atual, msg_bot(
+                'Bot', 'Extraindo mensagens...'))
+            chat.mark_as_replied(chat_atual, chat_escolhido)
+            chat.extract_messages(
+                chat.title_of_chats[chat_escolhido['message']])
+        else:
+            chat.reply_message(chat_atual, msg_bot(
+                'Bot', 'Chat não encontrado!'))
+            chat.mark_as_replied(chat_atual, chat_escolhido)
     if f'{corresponded} adicionar' in chat_atual['last_message']:
         chat.list_chats()
         chat.reply_message(main_chat, msg_bot(
@@ -82,9 +100,8 @@ while True:
     elif f'{corresponded} oi' in chat_atual['last_message']:
         chat.reply_message(chat_atual, msg_bot('Bot', 'Olá! Tudo bem?'))
         chat.mark_as_replied(chat_atual, message)
-    elif f'{corresponded} display' in chat_atual['last_message']:
+    elif f'{corresponded} display' in chat_atual['last_message'] and chat.is_main_chat(chat_atual):
         chat.display()
-        chat.reply_message(chat_atual, msg_bot('Bot', 'Na tela!'))
         chat.mark_as_replied(chat_atual, message)
     else:
         chat.reply_message(chat_atual, msg_bot('Bot', 'Não entendi!'))
