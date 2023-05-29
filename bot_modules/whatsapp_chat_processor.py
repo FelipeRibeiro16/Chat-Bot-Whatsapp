@@ -33,12 +33,15 @@ def process_whatsapp_chat(input_file_path: str, output_file_path: str) -> None:
     data.dropna(subset=['name'], inplace=True)
 
     subdata = data['message'].str.split('\t', n=2, expand=True)
-    subdata[2] = subdata.apply(lambda row: f"""{row[1]}\t{row[2] if row[2] is not None else ''}""" if row[1]
-                               is not None and not row[1].startswith('+') else row[2], axis=1)
-    subdata.drop(columns=[1], inplace=True)
+    if len(subdata.columns.tolist()) > 1:
+        subdata[2] = subdata.apply(lambda row: f"""{row[1]}\t{row[2] if row[2] is not None else ''}""" if row[1]
+                                   is not None and not row[1].startswith('+') else row[2], axis=1)
+        subdata.drop(columns=[1], inplace=True)
 
-    msgs = subdata.apply(
-        lambda row: row[0] if row[2] is None else None, axis=1)
+        msgs = subdata.apply(
+            lambda row: row[0] if row[2] is None else None, axis=1)
+    else:
+        msgs = subdata.apply(lambda row: row[0], axis=1)
     for i, msg in enumerate(msgs):
         if msg is None:
             plain_msg = subdata.iloc[i, -1].split('\t')
@@ -53,7 +56,6 @@ def process_whatsapp_chat(input_file_path: str, output_file_path: str) -> None:
     data['timestamp'] = data['timestamp'].str.replace(',', ' no dia')
     data_final = data.apply(
         lambda row: f"{row['name']}{row['message']}", axis=1)
-    data.drop(columns=['name', 'timestamp', 'message'], inplace=True)
     data = data.reindex(columns=['name', 'message', 'timestamp'])
     data.to_csv(f"{os.getcwd()}\\data\\messages\\messages_extracted.csv",
                 sep=';', encoding='utf-8', index=False)
