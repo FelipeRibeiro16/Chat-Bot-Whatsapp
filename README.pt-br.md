@@ -7,7 +7,10 @@ Para instalar o projeto, você deve ter o Python 3.8 ou superior instalado e, em
 ```bash
 pip install -r requirements.txt
 ```
-
+Então, para usar o ChatGPT, você deve fornecer uma chave de API em um arquivo .env na raiz do projeto, o arquivo .env deve ter o seguinte conteúdo:
+```bash
+OPENAI_API_KEY=SUA_CHAVE_DE_API
+```
 ## Uso
 Para usar o projeto, você deve executar o arquivo main.py com o seguinte comando:
 ```bash
@@ -28,13 +31,16 @@ Os comandos são:
 - arquivar: O bot arquivará todos os chats (disponível apenas no chat principal).
 - arquivar grupo: O bot arquivará todos os chats de grupos (disponível apenas no chat principal).
 - arquivar chats: O bot arquivará todos os chats que não são grupos (disponível apenas no chat principal).
+- resumir: O bot irá listar as conversas que não estão arquivadas e você deve escolher uma delas para resumir as mensagens. Para escolher uma conversa, você deve enviar o número da conversa, listado pelo bot. Depois disso, o bot responderá com "Extraindo mensagens..." e começará a extrair as mensagens. Em seguida, o bot responderá com "Processando..." e começará a processar as mensagens. Depois disso, o bot responderá com o resumo das mensagens (disponível apenas no chat principal).
 
-E se você enviar uma mensagem com o prefixo "/bot" e o bot não reconhecer o comando ou for digitado em um chat sem permissões, ele responderá com "Não entendi".
+E se você enviar uma mensagem com o prefixo "/bot" sem um comando, o bot usará o [ChatGPT] para responder à mensagem.
 
 ## Arquivos e pastas
 - O arquivo main.py usa os módulos do projeto para executar o bot.
 - A pasta bot_modules contém os módulos do projeto.
 - O arquivo whatsapp.py presente na pasta bot_modules contém os módulos responsáveis por automatizar o WhatsApp.
+- O arquivo whatsapp_chat_processor.py na pasta bot_modules contém os módulos que são responsáveis por processar as mensagens do chat.
+- O arquivo chatgpt.py na pasta bot_modules contém os módulos que são responsáveis por usar o ChatGPT para responder e resumir as mensagens.
 - A pasta data contém os arquivos que são usados para armazenar dados, como cookies do Chrome e a pasta de download do bot.
 - E a pasta .wdm contém o chromedriver que é usado para automatizar o navegador.
 
@@ -42,14 +48,17 @@ E se você enviar uma mensagem com o prefixo "/bot" e o bot não reconhecer o co
 Os módulos do projeto são:
 - whatsapp: Este módulo é responsável por iniciar o navegador e fechá-lo.
 - chat: Este módulo é responsável por automatizar o chat, como enviar mensagens, criar adesivos e arquivar conversas.
+- chat_processor: Este módulo é responsável por processar as mensagens do chat.
+- message_summary: Este módulo é responsável por resumir as mensagens do chat usando o ChatGPT.
+- gpt_response: Este módulo é responsável por usar o ChatGPT para responder às mensagens do chat.
 
 ## TODO
 - [X] Criar figurinha com a última imagem enviada no chat.
 - [X] Arquivar todas as conversas.
 - [X] Arquivar todas as conversas em grupo.
 - [X] Arquivar todas as conversas que não são em grupo.
-- [ ] Resumir mensagens.
-- [ ] Integração com o ChatGPT.
+- [X] Resumir mensagens.
+- [X] Integração com o ChatGPT.
 - [ ] Criar figurinha com o último vídeo enviado no chat.
 - [ ] Criar figurinha com o último gif enviado no chat.
 

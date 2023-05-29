@@ -10,6 +10,11 @@ To install the project you must have python 3.8 or higher installed, then you mu
 pip install -r requirements.txt
 ```
 
+Then to use the ChatGPT you must provide a API key on a .env file in the root of the project, the .env file must have the following content:
+```bash
+OPENAI_API_KEY=YOUR_API_KEY
+```
+
 ## Usage
 To use the project you must run the main.py file with the command:
 ```bash
@@ -29,13 +34,16 @@ The commands are:
 - arquivar: The bot will archive all chats (Only available in the main chat).
 - arquivar grupo: The bot will archive all groups chats (Only available in the main chat).
 - arquivar chats: The bot will archive all chats there are not groups (Only available in the main chat).
+- resumir: The bot will list the chats there are unarchived and you must choose one of them to
+summarize the messages. To choose a chat you must send the number of the chat, listed by the bot, after that the bot will respond with "Extraindo mensagens..." and will start to extract the messages, after that the bot will respond with "Processando..." and will start to process the messages, after that the bot will respond with the summarize of the messages (Only available in the main chat).
 
-And if you send a message with the prefix "/bot" and the bot does not recognize the command or was send in a chat without permissions, it will respond with "Não entendi".
-
+And if you send a message with the prefix "/bot" without a command the bot will use the [ChatGPT] to respond to the message.
 ## Files and folders
 - The main.py file uses the modules of the project to run the bot.
 - The folder bot_modules contains the modules of the project.
 - The whatsapp.py present in the folder bot_modules file contains the modules that is responsible for automating WhatsApp.
+- The whatsapp_chat_processor.py in the folder bot_modules file contains the modules that is responsible for processing the messages of the chat.
+- The chatgpt.py in the folder bot_modules file contains the modules that is responsible for using the ChatGPT to respond and summarize the messages.
 - The folder data contains the files that are used to store data, such as chrome cookies and the bot's download folder.
 - And the .wdm folder contains the chromedriver that is used to automate the browser.
 
@@ -43,14 +51,17 @@ And if you send a message with the prefix "/bot" and the bot does not recognize 
 The modules of the project are:
 - whatsapp: This module is responsible for starting the browser and closing it.
 - chat: This module is responsible for automating the chat, such as sending messages, creating stickers and archiving chats.
+- chat_processor: This module is responsible for processing the messages of the chat.
+- message_summary: This module is responsible for summarizing the messages of the chat using ChatGPT.
+- gpt_response: This module is responsible for using the ChatGPT to respond to the messages of the chat.
 
 ## TODO
 - [X] Create a sticker with the last image sent in the chat.
 - [X] Archive all chats.
 - [X] Archive all groups chats.
 - [X] Archive all chats there are not groups.
-- [ ] Resume messages.
-- [ ] Integration with ChatGPT.
+- [X] Summarize messages.
+- [X] Integration with ChatGPT.
 - [ ] Create a sticker with the last video sent in the chat.
 - [ ] Create a sticker with the last gif sent in the chat.
 

@@ -1,6 +1,11 @@
 # %%
 from bot_modules import whatsapp
 from bot_modules import chat as chat_module
+from bot_modules import chat_processor
+import os
+from bot_modules import message_summary
+from bot_modules import gpt_response
+# %%
 wp = whatsapp()
 wp.start()
 driver = wp.driver
@@ -46,11 +51,18 @@ while True:
             chat.mark_as_replied(chat_atual, chat_escolhido)
             chat.extract_messages(
                 chat.title_of_chats[chat_escolhido['message']])
+            chat.reply_message(chat_atual, msg_bot('Bot', 'Processando...'))
+            chat_processor(f'{os.getcwd()}\\data\\messages\\messages_extracted.csv',
+                           f'{os.getcwd()}\\data\\messages\\messages_process.csv')
+            with open(f'{os.getcwd()}\\data\\messages\\messages_process.csv', 'r', encoding='utf-8') as file:
+                messages = file.read()
+            chat.reply_message(chat_atual, msg_bot(
+                'Bot', message_summary(messages)))
         else:
             chat.reply_message(chat_atual, msg_bot(
                 'Bot', 'Chat não encontrado!'))
             chat.mark_as_replied(chat_atual, chat_escolhido)
-    if f'{corresponded} adicionar' in chat_atual['last_message']:
+    elif f'{corresponded} adicionar' in chat_atual['last_message']:
         chat.list_chats()
         chat.reply_message(main_chat, msg_bot(
             'Bot', 'Selecione o contato ou grupo?'))
@@ -104,7 +116,11 @@ while True:
         chat.display()
         chat.mark_as_replied(chat_atual, message)
     else:
-        chat.reply_message(chat_atual, msg_bot('Bot', 'Não entendi!'))
+        response = gpt_response(chat_atual['last_message'])
+        while not response:
+            response = gpt_response(chat_atual['last_message'])
+        chat.reply_message(chat_atual, msg_bot(
+            'Bot', response))
         chat.mark_as_replied(chat_atual, message)
 
 # %%

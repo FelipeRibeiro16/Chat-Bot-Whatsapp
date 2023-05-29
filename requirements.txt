@@ -1,5 +1,8 @@
+openai==0.27.7
+python-dotenv==1.0.0
 Pillow==9.4.0
 pyzbar==0.1.9
 qrcode==7.4.2
 selenium==4.8.2
 webdriver_manager==3.8.3
+pandas==1.5.3

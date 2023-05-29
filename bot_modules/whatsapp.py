@@ -133,6 +133,7 @@ class WhatsApp:
         """
         if self.driver is not None:
             self.driver.close()
+            Chat.reset(self)
 
 
 class Chat:
@@ -355,7 +356,9 @@ class Chat:
         Returns:
             None
         """
-        self.chats = []
+        self.chats: list = []
+        self.main_chat: dict = {}
+        self.title_of_chats: dict = {}
 
     def display(self, by: str = '') -> None:
         """Displays the chat list
@@ -521,6 +524,7 @@ class Chat:
         Returns:
             None
         """
+        self.title_of_chats = {}
         list_of_chats = self.driver.find_elements(By.XPATH,
                                                   """
                                                     .//div[@data-testid="cell-frame-title"]/span[1]
@@ -726,7 +730,6 @@ class Chat:
                                                    """
                                                       (//div[@role="application"]/div[@role="row"])[last()]
                                                       """)
-
             text = message_box.text.split("\n")
             messages = {
                 'time': __message_time(text[1]),
