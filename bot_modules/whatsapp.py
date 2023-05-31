@@ -910,7 +910,8 @@ class Chat:
             """
             audios_ogg = glob.glob(f"{os.getcwd()}\\data\\downloads\\*.ogg")
             audios_mp3 = glob.glob(f"{os.getcwd()}\\data\\downloads\\*.mp3")
-            audios = audios_ogg + audios_mp3
+            audios_mp4 = glob.glob(f"{os.getcwd()}\\data\\downloads\\*.mp4")
+            audios = audios_ogg + audios_mp3 + audios_mp4
             for audio in audios:
                 os.remove(audio)
         try:
@@ -957,15 +958,24 @@ class Chat:
                                              //li[@data-testid='mi-msg-download']
                                              """)
         download_audio.click()
-        while not glob.glob(f"{os.getcwd()}\\data\\downloads\\*.ogg"):
+        audio_files = glob.glob(f"{os.getcwd()}\\data\\downloads\\*.ogg") + \
+            glob.glob(f"{os.getcwd()}\\data\\downloads\\*.mp4")
+        while not audio_files:
+            audio_files = glob.glob(f"{os.getcwd()}\\data\\downloads\\*.ogg") + \
+                glob.glob(f"{os.getcwd()}\\data\\downloads\\*.mp4")
             sleep(0.5)
         else:
-            ogg_file = glob.glob(f"{os.getcwd()}\\data\\downloads\\*.ogg")[0]
-
-        mp3_file = f"{ogg_file[:-4]}.mp3"
-        sound = AudioSegment.from_ogg(ogg_file)
-        sound.export(mp3_file, format="mp3")
-        text_transcriber = transcriber(mp3_file)
+            audio_file = audio_files[0]
+        if audio_file.endswith(".ogg"):
+            mp3_file = f"{audio_file[:-4]}.mp3"
+            sound = AudioSegment.from_ogg(audio_file)
+            sound.export(mp3_file, format="mp3")
+            text_transcriber = transcriber(mp3_file)
+        else:
+            mp3_file = f"{audio_file[:-4]}.mp3"
+            sound = AudioSegment.from_file(audio_file, format="mp4")
+            sound.export(mp3_file, format="mp3")
+            text_transcriber = transcriber(mp3_file)
         if text_transcriber:
             __delete_audios()
             return text_transcriber
