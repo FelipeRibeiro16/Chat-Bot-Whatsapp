@@ -1,6 +1,8 @@
 # %%
 from datetime import datetime, time
+from pydub import AudioSegment
 import glob
+from .chatgpt import audio_transcriber as transcriber
 import os
 import io
 import qrcode
@@ -19,7 +21,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
-
 
 os.environ['WDM_LOCAL'] = '1'
 
@@ -880,6 +881,86 @@ class Chat:
         sleep(1)
         __delete_images()
         return True
+
+    def audio_reader(self) -> bool | str:
+        """Reads the last audio in the chat
+
+        Args:
+            chat (dict): The chat to read the audio
+
+        Returns:
+            bool | str: The text of the audio if the audio was transcribed, False otherwise
+
+        """
+
+        def __delete_audios() -> None:
+            """Deletes the audios in the downloads folder
+            Returns:
+                None
+            """
+            audios_ogg = glob.glob(f"{os.getcwd()}\\data\\downloads\\*.ogg")
+            audios_mp3 = glob.glob(f"{os.getcwd()}\\data\\downloads\\*.mp3")
+            audios = audios_ogg + audios_mp3
+            for audio in audios:
+                os.remove(audio)
+        try:
+            WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.XPATH,
+                                                                                """
+                                                                                //span[@data-testid='audio-play']
+                                                                                """)))
+
+        except TimeoutException:
+            return False
+        elements = self.driver.find_elements(By.XPATH,
+                                             """
+                                               //span[@data-testid='audio-play'] 
+                                                """)
+        try:
+            element = elements[-1]
+        except IndexError:
+            return False
+
+        actionChains = ActionChains(self.driver)
+        actionChains.move_to_element(element).perform()
+        try:
+            WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable((By.XPATH,
+                                                                            """
+                                                                                //span[@data-testid='down-context']
+                                                                                """)))
+
+        except TimeoutException:
+            return False
+        down_menu = self.driver.find_element(By.XPATH,
+                                             """
+                                        //span[@data-testid='down-context']
+                                        """)
+        down_menu.click()
+        try:
+            WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable((By.XPATH,
+                                                                            """
+                                                                                //li[@data-testid='mi-msg-download']
+                                                                                """)))
+        except TimeoutException:
+            return False
+        download_audio = self.driver.find_element(By.XPATH,
+                                                  """
+                                             //li[@data-testid='mi-msg-download']
+                                             """)
+        download_audio.click()
+        while not glob.glob(f"{os.getcwd()}\\data\\downloads\\*.ogg"):
+            sleep(0.5)
+        else:
+            ogg_file = glob.glob(f"{os.getcwd()}\\data\\downloads\\*.ogg")[0]
+
+        mp3_file = f"{ogg_file[:-4]}.mp3"
+        sound = AudioSegment.from_ogg(ogg_file)
+        sound.export(mp3_file, format="mp3")
+        text_transcriber = transcriber(mp3_file)
+        if text_transcriber:
+            __delete_audios()
+            return text_transcriber
+        __delete_audios()
+        return False
 
     def archive(self, by: str = '') -> None:
         """Archives the chats

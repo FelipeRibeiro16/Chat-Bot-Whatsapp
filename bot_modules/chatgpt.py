@@ -68,3 +68,16 @@ def message_summary(input_chat: str, engine: str = "text-davinci-003", temperatu
         stop=stop
     )
     return response.choices[0].text.strip()
+
+
+def audio_transcriber(audio_path: str) -> str:
+    """Transcribe an audio file using the OpenAI API
+    Args:
+        audio_path (str): The path to the audio file
+
+    Returns:
+        str: The transcript
+    """
+    audio_file = open(audio_path, "rb")
+    transcript = openai.Audio.transcribe("whisper-1", audio_file)
+    return transcript['text']

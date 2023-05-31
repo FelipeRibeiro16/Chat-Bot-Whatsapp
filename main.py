@@ -62,22 +62,31 @@ while True:
             chat.reply_message(chat_atual, msg_bot(
                 'Bot', 'Chat não encontrado!'))
             chat.mark_as_replied(chat_atual, chat_escolhido)
+    elif f'{corresponded} transcrever' in chat_atual['last_message']:
+        transcribe = chat.audio_reader()
+        if transcribe:
+            chat.reply_message(chat_atual, msg_bot('Bot', transcribe))
+            chat.mark_as_replied(chat_atual, message)
+        else:
+            chat.reply_message(chat_atual, msg_bot(
+                'Bot', 'Não foi possível transcrever!'))
+            chat.mark_as_replied(chat_atual, message)
     elif f'{corresponded} adicionar' in chat_atual['last_message']:
         chat.list_chats()
         chat.reply_message(main_chat, msg_bot(
             'Bot', 'Selecione o contato ou grupo?'))
         chat.mark_as_replied(chat_atual, message)
         chat_escolhido = chat.listen_messages(
-            main_chat, 'Selecione o contato ou grupo')['message']
-        if chat_escolhido in chat.title_of_chats.keys():
-            if chat.new_chat(chat.title_of_chats[chat_escolhido]):
+            main_chat, 'Selecione o contato ou grupo')
+        if chat_escolhido['message'].strip() in chat.title_of_chats.keys():
+            if chat.new_chat(chat.title_of_chats[chat_escolhido['message']]):
                 chat.reply_message(main_chat, msg_bot(
                     'Bot', 'Adicionado com sucesso!'))
-                chat.mark_as_replied(main_chat, message)
+                chat.mark_as_replied(main_chat, chat_escolhido)
             else:
                 chat.reply_message(main_chat, msg_bot(
                     'Bot', 'Não foi possível adicionar!'))
-                chat.mark_as_replied(main_chat, message)
+                chat.mark_as_replied(main_chat, chat_escolhido)
         else:
             chat.reply_message(main_chat, msg_bot(
                 'Bot', 'Contato ou grupo não encontrado!'))
@@ -117,11 +126,14 @@ while True:
         chat.mark_as_replied(chat_atual, message)
     else:
         response = gpt_response(chat_atual['last_message'])
-        while not response:
-            response = gpt_response(chat_atual['last_message'])
-        chat.reply_message(chat_atual, msg_bot(
-            'Bot', response))
+        if response:
+            chat.reply_message(chat_atual, msg_bot(
+                'Bot', response))
+        else:
+            chat.reply_message(chat_atual, msg_bot(
+                'Bot', 'Não entendi!'))
         chat.mark_as_replied(chat_atual, message)
 
 # %%
 wp.close()
+# %%

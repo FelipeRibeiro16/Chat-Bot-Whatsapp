@@ -2,15 +2,22 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/FelipeRibeiro16/Chat-Bot-Whatsapp/blob/d8987a06d7b5a4796090d6b2fd5dc8e2e01ce6af/README.md)
 [![pt-br](https://img.shields.io/badge/lang-pt--br-green.svg)](https://github.com/FelipeRibeiro16/Chat-Bot-Whatsapp/blob/d8987a06d7b5a4796090d6b2fd5dc8e2e01ce6af/README.pt-br.md)
 ## Description
-This project is a chat bot for WhatsApp, it is a bot that can be used to send messages, create stickers and archive chats. This project is made with the help of the [selenium](https://www.selenium.dev/) library, which is a library that allows us to automate the browser, in this case we use it to automate WhatsApp.
+This project is a chat bot for WhatsApp, it is a bot that can be used to send messages, create stickers, archive chats, transcribe audios, summarize chats and use the ChatGPT in the chats. This project is made with the help of the [selenium](https://www.selenium.dev/) library, which is a library that allows us to automate the browser, in this case we use it to automate WhatsApp.
 
 ## Installation
-To install the project you must have python 3.8 or higher installed, then you must install the dependencies with the following command:
+To install the project you must have python 3.8 or higher installed, then you must clone the project with the following command:
+```bash
+git clone https://github.com/FelipeRibeiro16/Chat-Bot-Whatsapp.git
+```
+
+After that you must install the FFmpeg, you can download it [here](https://ffmpeg.org/download.html), then you must add the FFmpeg to the PATH of your system if you use windows, you can see how to do it [here](https://www.thewindowsclub.com/how-to-install-ffmpeg-on-windows-10).
+
+Then you must install the dependencies with the following command:
 ```bash
 pip install -r requirements.txt
 ```
 
-Then to use the ChatGPT you must provide a API key on a .env file in the root of the project, the .env file must have the following content:
+And finnaly to use the ChatGPT you must provide a API key on a .env file in the root of the project, the .env file must have the following content:
 ```bash
 OPENAI_API_KEY=YOUR_API_KEY
 ```
@@ -36,6 +43,7 @@ The commands are:
 - arquivar chats: The bot will archive all chats there are not groups (Only available in the main chat).
 - resumir: The bot will list the chats there are unarchived and you must choose one of them to
 summarize the messages. To choose a chat you must send the number of the chat, listed by the bot, after that the bot will respond with "Extraindo mensagens..." and will start to extract the messages, after that the bot will respond with "Processando..." and will start to process the messages, after that the bot will respond with the summarize of the messages (Only available in the main chat).
+- transcrever: The bot will transcribe the last audio sent in the chat.
 
 And if you send a message with the prefix "/bot" without a command the bot will use the [ChatGPT] to respond to the message.
 ## Files and folders
@@ -54,6 +62,7 @@ The modules of the project are:
 - chat_processor: This module is responsible for processing the messages of the chat.
 - message_summary: This module is responsible for summarizing the messages of the chat using ChatGPT.
 - gpt_response: This module is responsible for using the ChatGPT to respond to the messages of the chat.
+- transcriber: This module is responsible for transcribing the audios of the chat.
 
 ## TODO
 - [X] Create a sticker with the last image sent in the chat.
@@ -62,6 +71,7 @@ The modules of the project are:
 - [X] Archive all chats there are not groups.
 - [X] Summarize messages.
 - [X] Integration with ChatGPT.
+- [X] Transcribe audios.
 - [ ] Create a sticker with the last video sent in the chat.
 - [ ] Create a sticker with the last gif sent in the chat.
 

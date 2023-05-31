@@ -1,13 +1,21 @@
 # Chat Bot WhatsApp
 ## Descrição
-Este projeto é um chat bot para o WhatsApp. É um bot que pode ser usado para enviar mensagens, criar figurinhas e arquivar conversas. Este projeto é feito com a ajuda da biblioteca [selenium](https://www.selenium.dev/), que é uma biblioteca que nos permite automatizar o navegador. Neste caso, usamos para automatizar o WhatsApp.
+Este projeto é um chat bot para o WhatsApp. É um bot que pode ser usado para enviar mensagens, criar figurinhas, arquivar conversas, transcrever áudios, resumir conversas e usar o ChatGPT nas conversas. Este projeto é feito com a ajuda da biblioteca [selenium](https://www.selenium.dev/), que é uma biblioteca que nos permite automatizar o navegador. Neste caso, usamos para automatizar o WhatsApp.
 
 ## Instalação
-Para instalar o projeto, você deve ter o Python 3.8 ou superior instalado e, em seguida, instalar as dependências com o seguinte comando:
+Para instalar o projeto, você deve ter o Python 3.8 ou superior instalado. Em seguida, você deve clonar o projeto com o seguinte comando:
+```bash
+git clone https://github.com/FelipeRibeiro16/Chat-Bot-Whatsapp.git
+```
+
+Depois disso, você deve instalar o FFmpeg, que pode ser baixado [aqui](https://ffmpeg.org/download.html). Em seguida, você deve adicionar o FFmpeg ao PATH do seu sistema caso utilize windows, pode ver como fazer isso [aqui](https://www.thewindowsclub.com/how-to-install-ffmpeg-on-windows-10).
+
+Então, você deve instalar as dependências com o seguinte comando:
 ```bash
 pip install -r requirements.txt
 ```
-Então, para usar o ChatGPT, você deve fornecer uma chave de API em um arquivo .env na raiz do projeto, o arquivo .env deve ter o seguinte conteúdo:
+
+Finalmente, para usar o ChatGPT, você deve fornecer uma chave de API em um arquivo .env na raiz do projeto, o arquivo .env deve ter o seguinte conteúdo:
 ```bash
 OPENAI_API_KEY=SUA_CHAVE_DE_API
 ```
@@ -32,6 +40,7 @@ Os comandos são:
 - arquivar grupo: O bot arquivará todos os chats de grupos (disponível apenas no chat principal).
 - arquivar chats: O bot arquivará todos os chats que não são grupos (disponível apenas no chat principal).
 - resumir: O bot irá listar as conversas que não estão arquivadas e você deve escolher uma delas para resumir as mensagens. Para escolher uma conversa, você deve enviar o número da conversa, listado pelo bot. Depois disso, o bot responderá com "Extraindo mensagens..." e começará a extrair as mensagens. Em seguida, o bot responderá com "Processando..." e começará a processar as mensagens. Depois disso, o bot responderá com o resumo das mensagens (disponível apenas no chat principal).
+- transcreva: O bot irá transcrever o último áudio enviado no chat.
 
 E se você enviar uma mensagem com o prefixo "/bot" sem um comando, o bot usará o [ChatGPT] para responder à mensagem.
 
@@ -59,6 +68,7 @@ Os módulos do projeto são:
 - [X] Arquivar todas as conversas que não são em grupo.
 - [X] Resumir mensagens.
 - [X] Integração com o ChatGPT.
+- [X] Transcrever áudios.
 - [ ] Criar figurinha com o último vídeo enviado no chat.
 - [ ] Criar figurinha com o último gif enviado no chat.
 
