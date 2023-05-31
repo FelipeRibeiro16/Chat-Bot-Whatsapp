@@ -361,7 +361,7 @@ class Chat:
         self.main_chat: dict = {}
         self.title_of_chats: dict = {}
 
-    def display(self, by: str = '') -> None:
+    def display(self, by: str = '') -> list[str]:
         """Displays the chat list
 
         Args:
@@ -370,39 +370,45 @@ class Chat:
         Returns:
             None
         """
+        self.update()
+
         def __display_groups() -> None:
             """Displays the groups in the chat list
 
             Returns:
-                None
+                list[str]: The groups in the chat list
             """
+            windows = ''
             for chat in self.chats:
                 if chat['is_group']:
-                    windows = f"{chat['title']}{' Silenciado' if chat['silenced'] else ''}\nUltima mensagem: {chat['last_message']}, {chat['date_last_message']}\n"
-                    self.reply_message(
-                        self.main_chat, self.__clean_text(windows))
+                    windows += self.__clean_text(
+                        f"{chat['title']}{' Silenciado' if chat['silenced'] else ''}\n")
+            return windows
 
-        def __display_chats() -> None:
+        def __display_chats() -> list[str]:
             """Displays the chats there are not groups in the chat list
 
             Returns:
-                None
+                list[str]: The chats there are not groups in the chat list
             """
+            windows = ''
             for chat in self.chats:
                 if not chat['is_group']:
-                    windows = f"{chat['title']}{' Silenciado' if chat['silenced'] else ''}\nUltima mensagem: {chat['last_message']}, {chat['date_last_message']}\n"
-                    self.reply_message(
-                        self.main_chat, self.__clean_text(windows))
+                    windows += self.__clean_text(
+                        f"{chat['title']}{' Silenciado' if chat['silenced'] else ''}\n")
+            return windows
 
-        def __display_all() -> None:
+        def __display_all() -> list[str]:
             """Displays all the chats in the chat list
 
             Returns:
-                None
+                list[str]: All the chats in the chat list
             """
+            windows = ''
             for chat in self.chats:
-                windows = f"{chat['title']}{' Silenciado' if chat['silenced'] else ''}\nUltima mensagem: {chat['last_message']}, {chat['date_last_message']}\n"
-                self.reply_message(self.main_chat, self.__clean_text(windows))
+                windows += self.__clean_text(
+                    f"{chat['title']}{' Silenciado' if chat['silenced'] else ''}\n")
+            return windows
 
         if by == "groups":
             return __display_groups()
@@ -525,6 +531,7 @@ class Chat:
         Returns:
             None
         """
+        self.update()
         self.title_of_chats = {}
         list_of_chats = self.driver.find_elements(By.XPATH,
                                                   """
@@ -673,7 +680,10 @@ class Chat:
                                      //div[@data-testid='conversation-compose-box-input']
                                      """
                                                    )
-            message_box.send_keys(reply)
+            clean_reply = reply.split('\n')
+            for line in clean_reply:
+                message_box.send_keys(line)
+                message_box.send_keys(Keys.SHIFT, Keys.ENTER)
             message_box.send_keys(Keys.ENTER)
         return True
 

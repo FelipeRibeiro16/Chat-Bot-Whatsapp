@@ -43,7 +43,7 @@ The commands are:
 - arquivar chats: The bot will archive all chats there are not groups (Only available in the main chat).
 - resumir: The bot will list the chats there are unarchived and you must choose one of them to
 summarize the messages. To choose a chat you must send the number of the chat, listed by the bot, after that the bot will respond with "Extraindo mensagens..." and will start to extract the messages, after that the bot will respond with "Processando..." and will start to process the messages, after that the bot will respond with the summarize of the messages (Only available in the main chat).
-- transcrever: The bot will transcribe the last audio sent in the chat.
+- transcreva: The bot will transcribe the last audio sent in the chat.
 
 And if you send a message with the prefix "/bot" without a command the bot will use the [ChatGPT] to respond to the message.
 ## Files and folders

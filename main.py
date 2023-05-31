@@ -3,6 +3,7 @@ from bot_modules import whatsapp
 from bot_modules import chat as chat_module
 from bot_modules import chat_processor
 import os
+import time
 from bot_modules import message_summary
 from bot_modules import gpt_response
 # %%
@@ -122,8 +123,15 @@ while True:
         chat.reply_message(chat_atual, msg_bot('Bot', 'Olá! Tudo bem?'))
         chat.mark_as_replied(chat_atual, message)
     elif f'{corresponded} display' in chat_atual['last_message'] and chat.is_main_chat(chat_atual):
-        chat.display()
-        chat.mark_as_replied(chat_atual, message)
+        display = chat.display()
+        if display:
+            chat.reply_message(chat_atual, msg_bot(
+                'Bot', display))
+            chat.mark_as_replied(chat_atual, message)
+        else:
+            chat.reply_message(chat_atual, msg_bot(
+                'Bot', 'Não foi possível exibir!'))
+            chat.mark_as_replied(chat_atual, message)
     else:
         response = gpt_response(chat_atual['last_message'])
         if response:
@@ -133,6 +141,7 @@ while True:
             chat.reply_message(chat_atual, msg_bot(
                 'Bot', 'Não entendi!'))
         chat.mark_as_replied(chat_atual, message)
+    time.sleep(0.5)
 
 # %%
 wp.close()
