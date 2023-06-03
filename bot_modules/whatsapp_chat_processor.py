@@ -3,6 +3,11 @@ import pandas as pd
 import os
 
 
+def process_whatsapp_message(message: str, corresponded: str) -> str:
+
+    return message.lower().replace(f'{corresponded} ', '')
+
+
 def process_whatsapp_chat(input_file_path: str, output_file_path: str) -> None:
     """Process a WhatsApp chat exported as a CSV file from the WhatsApp app
     Args:

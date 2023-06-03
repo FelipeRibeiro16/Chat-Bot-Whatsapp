@@ -45,7 +45,7 @@ class WhatsApp:
             bool: True if the bot started successfully
         """
         chrome_options = Options()
-        # chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--headless")
         chrome_options.add_argument('window-size=1920x2160')
         chrome_options.add_experimental_option(
             'excludeSwitches', ['enable-logging'])
@@ -68,7 +68,7 @@ class WhatsApp:
         chrome_options.add_experimental_option("prefs", prefs)
 
         self.driver = webdriver.Chrome(service=ChromeService(
-            ChromeDriverManager(path=f"{os.getcwd()}\\data\\Drivers", cache_valid_range=365).install()), options=chrome_options)
+            ChromeDriverManager(path=f"{os.getcwd()}", cache_valid_range=365).install()), options=chrome_options)
         self.driver.execute_cdp_cmd('Network.setUserAgentOverride', {
                                     "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36'})
         self.driver.execute_script(
