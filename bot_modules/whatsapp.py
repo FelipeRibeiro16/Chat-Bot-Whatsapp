@@ -46,7 +46,7 @@ class WhatsApp:
         """
         chrome_options = Options()
         chrome_options.add_argument("--headless")
-        chrome_options.add_argument('window-size=1920x2160')
+        chrome_options.add_argument("--start-maximized")
         chrome_options.add_experimental_option(
             'excludeSwitches', ['enable-logging'])
         chrome_options.add_argument("--disable-extensions")
@@ -299,6 +299,17 @@ class Chat:
         if self.add(new):
             return True
         return False
+
+    def rest(self) -> None:
+        """Rests the bot
+
+        Returns:
+            None
+        """
+        if self.__main_chat_is_set():
+            self.driver.execute_script(
+                "arguments[0].scrollIntoView();", self.main_chat['id'])
+            self.main_chat['id'].click()
 
     def return_messages(self, title: str) -> list[str]:
         """Returns the messages of a chat

@@ -38,6 +38,7 @@ main_chat = chat.main_chat
 chat.reply_message(main_chat, msg_bot('Bot', 'Olá! Estou pronto!'))
 print('Running...')
 while True:
+    chat.rest()
     chat_atual = chat.listen_chats(corresponded)
     message = chat.last_message(chat_atual)
     if not message:
