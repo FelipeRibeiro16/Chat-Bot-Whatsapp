@@ -69,9 +69,9 @@ while True:
                 chat.reply_message(
                     chat_atual, msg_bot('Bot', 'Processando...'))
                 chat_processor(f'{os.getcwd()}\\data\\messages\\messages_extracted.csv',
-                               f'{os.getcwd()}\\data\\messages\\messages_process.csv')
-                with open(f'{os.getcwd()}\\data\\messages\\messages_process.csv', 'r', encoding='utf-8') as file:
-                    messages = file.read()
+                               f'{os.getcwd()}\\data\\messages\\messages_process.json')
+                messages = load_json(
+                    f'{os.getcwd()}\\data\\messages\\messages_process.json')
                 chat.reply_message(chat_atual, msg_bot(
                     'Bot', message_summary(messages)))
             else:
@@ -166,4 +166,3 @@ while True:
         chat.mark_as_replied(chat_atual, message)
 # %%
 wp.close()
-# %%

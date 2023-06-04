@@ -626,12 +626,17 @@ class Chat:
                                                   """
                        //div[@data-testid="msg-container"]
                        """)
-        message_text = 'name;from;message\n'
+        message_text = 'name;from;message;reply\n'
         name = ''
         for message_box in message_boxes:
             try:
                 self.driver.execute_script(
                     "arguments[0].scrollIntoView();", message_box)
+                try:
+                    msg = message_box.find_element(
+                        By.CLASS_NAME, 'selectable-text').text
+                except NoSuchElementException:
+                    continue
                 element = message_box.find_element(
                     By.CLASS_NAME, 'copyable-text')
                 try:
@@ -639,10 +644,16 @@ class Chat:
                         By.XPATH, './div[2]/div[1]/div[1]/span[1]').text
                 except NoSuchElementException:
                     name = ''
+                try:
+                    reply = message_box.find_element(
+                        By.XPATH, """.//div[@data-testid="quoted-message"]""").text
+                except:
+                    reply = ''
                 msg_from = element.get_attribute(
                     'data-pre-plain-text').replace('\n', '\t')
-                msg = element.text.replace('\n', '\t')
-                message_text += f"""{name};{msg_from};{msg}\n"""
+                msg = msg.replace('\n', '').strip()
+                reply = reply.replace('\n', '\t').strip()
+                message_text += f"""{name};{msg_from};{msg};{reply}\n"""
             except NoSuchElementException:
                 pass
         with open(f'{os.getcwd()}\\data\\messages\\messages_extracted.csv', 'w', encoding='utf-8') as f:
