@@ -1,10 +1,21 @@
 # %%
 import pandas as pd
+from pathlib import Path
 from datetime import datetime
 import os
 
+WORK_DIRECTORY = os.getcwd()
+
 
 def process_whatsapp_message(message: str, corresponded: str) -> str:
+    """Process a WhatsApp message
+    Args:
+        message (str): Message to be processed
+        corresponded (str): Corresponded of the bot
+
+    Returns:
+        str: Processed message
+    """
 
     return message.lower().replace(f'{corresponded} ', '')
 
@@ -13,7 +24,7 @@ def process_whatsapp_chat(input_file_path: str, output_file_path: str) -> None:
     """Process a WhatsApp chat exported as a CSV file from the WhatsApp app
     Args:
         input_file_path (str): Path to the input CSV file
-        output_file_path (str): Path to the output CSV file
+        output_file_path (str): Path to the output JSON file
 
     Returns:
         None
@@ -65,8 +76,11 @@ def process_whatsapp_chat(input_file_path: str, output_file_path: str) -> None:
     data_final = data_final[['role', 'content']]
 
     data = data.reindex(columns=['name', 'message', 'reply', 'timestamp'])
-    if not os.path.exists(f"{os.getcwd()}\\data\\messages\\dump_messages"):
-        os.makedirs(f"{os.getcwd()}\\data\\messages\\dump_messages")
-    data.to_csv(f"{os.getcwd()}\\data\\messages\\dump_messages\\{stamp}.csv",
+    if not Path.exists(Path(f"{WORK_DIRECTORY}/data/messages/dump_messages")):
+        Path.mkdir(Path(f"{WORK_DIRECTORY}/data/messages/dump_messages"))
+    data.to_csv(Path(f"{WORK_DIRECTORY}/data/messages/dump_messages/{stamp}.csv"),
                 sep=';', encoding='utf-8', index=False)
     data_final.to_json(output_file_path, orient='records')
+# %%
+
+# %%

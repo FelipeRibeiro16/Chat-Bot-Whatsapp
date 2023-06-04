@@ -1,4 +1,5 @@
 # %%
+from pathlib import Path
 from datetime import datetime, time
 from pydub import AudioSegment
 import glob
@@ -24,6 +25,8 @@ from selenium.webdriver.common.keys import Keys
 
 os.environ['WDM_LOCAL'] = '1'
 
+WORK_DIRECTORY = os.getcwd()
+
 
 class WhatsApp:
     """WhatsApp bot class that initializes the bot and closes it
@@ -46,6 +49,7 @@ class WhatsApp:
         """
         chrome_options = Options()
         chrome_options.add_argument("--headless")
+        chrome_options.add_argument("window-size=1080,720")
         chrome_options.add_argument("--start-maximized")
         chrome_options.add_experimental_option(
             'excludeSwitches', ['enable-logging'])
@@ -60,15 +64,15 @@ class WhatsApp:
         chrome_options.add_experimental_option('useAutomationExtension', False)
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument(
-            f"--user-data-dir={os.getcwd()}\\data\\bot-data")
+            f"--user-data-dir={Path(f'{WORK_DIRECTORY}/data/bot-data')}")
         prefs = {"profile.default_content_settings.popups": 0,
-                 "download.default_directory": f"{os.getcwd()}\\data\\downloads",
+                 "download.default_directory": f"{Path(f'{WORK_DIRECTORY}/data/downloads')}",
                  "download.prompt_for_download": False,
                  "download.directory_upgrade": True}
         chrome_options.add_experimental_option("prefs", prefs)
 
         self.driver = webdriver.Chrome(service=ChromeService(
-            ChromeDriverManager(path=f"{os.getcwd()}", cache_valid_range=365).install()), options=chrome_options)
+            ChromeDriverManager(path=WORK_DIRECTORY, cache_valid_range=365).install()), options=chrome_options)
         self.driver.execute_cdp_cmd('Network.setUserAgentOverride', {
                                     "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36'})
         self.driver.execute_script(
@@ -656,7 +660,7 @@ class Chat:
                 message_text += f"""{name};{msg_from};{msg};{reply}\n"""
             except NoSuchElementException:
                 pass
-        with open(f'{os.getcwd()}\\data\\messages\\messages_extracted.csv', 'w', encoding='utf-8') as f:
+        with open(Path(f'{WORK_DIRECTORY}/data/messages/messages_extracted.csv'), 'w', encoding='utf-8') as f:
             f.write(message_text)
 
     def last_message(self, chat: dict) -> dict:
@@ -826,7 +830,8 @@ class Chat:
             Returns:
                 None
             """
-            images = glob.glob(f"{os.getcwd()}\\data\\downloads\\*.jpeg")
+            images = glob.glob(
+                f"{Path(f'{WORK_DIRECTORY}/data/downloads/*.jpeg')}")
             for image in images:
                 os.remove(image)
 
@@ -895,7 +900,7 @@ class Chat:
                                      """
                                      //input[@accept='image/*']
                                      """
-                                     ).send_keys(glob.glob(f"{os.getcwd()}\\data\\downloads\\*.jpeg")[0])
+                                     ).send_keys(glob.glob(f"{Path(f'{WORK_DIRECTORY}/data/downloads/*.jpeg')}")[0])
         try:
             WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable((By.XPATH,
                                                                             """
@@ -930,9 +935,12 @@ class Chat:
             Returns:
                 None
             """
-            audios_ogg = glob.glob(f"{os.getcwd()}\\data\\downloads\\*.ogg")
-            audios_mp3 = glob.glob(f"{os.getcwd()}\\data\\downloads\\*.mp3")
-            audios_mp4 = glob.glob(f"{os.getcwd()}\\data\\downloads\\*.mp4")
+            audios_ogg = glob.glob(
+                f"{Path(f'{WORK_DIRECTORY}/data/downloads/*.ogg')}")
+            audios_mp3 = glob.glob(
+                f"{Path(f'{WORK_DIRECTORY}/data/downloads/*.mp3')}")
+            audios_mp4 = glob.glob(
+                f"{Path(f'{WORK_DIRECTORY}/data/downloads/*.mp4')}")
             audios = audios_ogg + audios_mp3 + audios_mp4
             for audio in audios:
                 os.remove(audio)
@@ -980,11 +988,11 @@ class Chat:
                                              //li[@data-testid='mi-msg-download']
                                              """)
         download_audio.click()
-        audio_files = glob.glob(f"{os.getcwd()}\\data\\downloads\\*.ogg") + \
-            glob.glob(f"{os.getcwd()}\\data\\downloads\\*.mp4")
+        audio_files = glob.glob(f"{Path(f'{WORK_DIRECTORY}/data/downloads/*.ogg')}") + \
+            glob.glob(f"{Path(f'{WORK_DIRECTORY}/data/downloads/*.mp4')}")
         while not audio_files:
-            audio_files = glob.glob(f"{os.getcwd()}\\data\\downloads\\*.ogg") + \
-                glob.glob(f"{os.getcwd()}\\data\\downloads\\*.mp4")
+            audio_files = glob.glob(f"{Path(f'{WORK_DIRECTORY}/data/downloads/*.ogg')}") + \
+                glob.glob(f"{Path(f'{WORK_DIRECTORY}/data/downloads/*.mp4')}")
             sleep(0.5)
         else:
             audio_file = audio_files[0]

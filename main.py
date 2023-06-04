@@ -1,5 +1,6 @@
 # %%
 from bot_modules import whatsapp
+from pathlib import Path
 from bot_modules import chat as chat_module
 from bot_modules import chat_processor, message_processor
 import os
@@ -7,6 +8,8 @@ import time
 from bot_modules import message_summary
 from bot_modules import gpt_response
 from bot_modules import load_json, save_json, get_closest_match, get_inputs, get_answer, new_input
+# %%
+WORK_DIRECTORY = os.getcwd()
 # %%
 wp = whatsapp()
 wp.start()
@@ -44,7 +47,7 @@ while True:
     if not message:
         continue
 
-    answers = load_json(r'data\messages\answers.json')
+    answers = load_json(Path(f'{WORK_DIRECTORY}/data/messages/answers.json'))
 
     input = message_processor(chat_atual['last_message'], corresponded)
 
@@ -68,10 +71,10 @@ while True:
                     chat.title_of_chats[chat_escolhido['message']])
                 chat.reply_message(
                     chat_atual, msg_bot('Bot', 'Processando...'))
-                chat_processor(f'{os.getcwd()}\\data\\messages\\messages_extracted.csv',
-                               f'{os.getcwd()}\\data\\messages\\messages_process.json')
+                chat_processor(Path(f'{WORK_DIRECTORY}/data/messages/messages_extracted.csv'),
+                               Path(f'{WORK_DIRECTORY}/data/messages/messages_process.json'))
                 messages = load_json(
-                    f'{os.getcwd()}\\data\\messages\\messages_process.json')
+                    Path(f'{WORK_DIRECTORY}/data/messages/messages_process.json'))
                 chat.reply_message(chat_atual, msg_bot(
                     'Bot', message_summary(messages)))
             else:
@@ -159,10 +162,13 @@ while True:
             if new_answer is None:
                 continue
             answers['answers'].append(new_answer)
-            save_json(r'data\messages\answers.json', answers)
+            save_json(
+                Path(f'{WORK_DIRECTORY}/data/messages/answers.json'), answers)
         else:
             chat.reply_message(chat_atual, msg_bot(
                 'Bot', 'Não entendi!'))
         chat.mark_as_replied(chat_atual, message)
 # %%
 wp.close()
+# %%
+import os
