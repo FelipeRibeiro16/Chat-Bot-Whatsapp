@@ -15,10 +15,14 @@ Então, você deve instalar as dependências com o seguinte comando:
 pip install -r requirements.txt
 ```
 
-Finalmente, para usar o ChatGPT, você deve fornecer uma chave de API em um arquivo .env na raiz do projeto, o arquivo .env deve ter o seguinte conteúdo:
+Por fim, para usar o ChatGPT, você deve fornecer uma chave de API em um arquivo .env na raiz do projeto. Para armazenar em cache as respostas e para salvar as mensagens de sumarização, você deve definir 'True' ou 'False' para não. O arquivo .env deve ter o seguinte conteúdo:
 ```bash
 OPENAI_API_KEY=SUA_CHAVE_DE_API
+CACHE_RESPONSES='True'
+DUMP_MESSAGES='True'
 ```
+
+Você também pode modificar a personalização das respostas e sumarizações do ChatGPT nos arquivos chat_response_role.json e message_summary_role.json na pasta /data/bot-config.
 ## Uso
 Para usar o projeto, você deve executar o arquivo main.py com o seguinte comando:
 ```bash
@@ -32,7 +36,6 @@ Os comandos do bot precisam ser escritos com o prefixo "/bot" (isso pode ser alt
 /bot oi
 ```
 Os comandos são:
-- oi: O bot responderá com "Olá, tudo bem?".
 - adicionar: O bot listará os chats que não estão arquivados e você deverá escolher um deles para adicionar à lista de chats que o bot ouvirá. Para escolher um chat, você deve enviar o número correspondente no chat, conforme listado pelo bot. Em seguida, o bot responderá com "Adicionado com sucesso!" e, em caso de erro, o bot responderá com "Não foi possível adicionar!" (disponível apenas no chat principal).
 - sair: O bot responderá com "Saindo!" e deixará de funcionar (disponível apenas no chat principal).
 - figurinha: O bot criará uma figurinha com a última imagem enviada no chat.
@@ -50,7 +53,8 @@ E se você enviar uma mensagem com o prefixo "/bot" sem um comando, o bot usará
 - O arquivo whatsapp.py presente na pasta bot_modules contém os módulos responsáveis por automatizar o WhatsApp.
 - O arquivo whatsapp_chat_processor.py na pasta bot_modules contém os módulos que são responsáveis por processar as mensagens do chat.
 - O arquivo chatgpt.py na pasta bot_modules contém os módulos que são responsáveis por usar o ChatGPT para responder e resumir as mensagens.
-- A pasta data contém os arquivos que são usados para armazenar dados, como cookies do Chrome e a pasta de download do bot.
+- O arquivo chat_handle.py na pasta bot_modules contém os módulos responsáveis por lidar com as entradas do chat e encontrar a melhor resposta para a entrada.
+- A pasta data contém os arquivos que são usados para armazenar dados, como cookies do Chrome, a pasta de download do bot, os arquivos de configuração do bot e o dump de mensagens do bot.
 - E a pasta .wdm contém o chromedriver que é usado para automatizar o navegador.
 
 ## Módulos
@@ -60,7 +64,7 @@ Os módulos do projeto são:
 - chat_processor: Este módulo é responsável por processar as mensagens do chat.
 - message_summary: Este módulo é responsável por resumir as mensagens do chat usando o ChatGPT.
 - gpt_response: Este módulo é responsável por usar o ChatGPT para responder às mensagens do chat.
-
+- chat_handle: Este módulo é responsável por lidar com as entradas do chat e encontrar a melhor resposta para a entrada.
 ## TODO
 - [X] Criar figurinha com a última imagem enviada no chat.
 - [X] Arquivar todas as conversas.

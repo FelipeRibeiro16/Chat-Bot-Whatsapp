@@ -17,11 +17,14 @@ Then you must install the dependencies with the following command:
 pip install -r requirements.txt
 ```
 
-And finnaly to use the ChatGPT you must provide a API key on a .env file in the root of the project, the .env file must have the following content:
+And finnaly to use the ChatGPT you must provide a API key on a .env file in the root of the project, for caching responses and for dump the messages of summarization you must set 'True' or 'False' to not, the .env file must have the following content:
 ```bash
 OPENAI_API_KEY=YOUR_API_KEY
+CACHE_RESPONSES='True'
+DUMP_MESSAGES='True'
 ```
 
+You also can modify the personalization of the responses and summarizations of the ChatGPT in the files chat_response_role.json and message_summary_role.json in the folder /data/bot-config.
 ## Usage
 To use the project you must run the main.py file with the command:
 ```bash
@@ -34,7 +37,6 @@ The commands of the bot need to be written with the prefix "/bot"(this can be ch
 /bot oi
 ```
 The commands are:
-- oi: The bot will respond with "Olá, tudo bem?".
 - adicionar: The bot will list the chats there are unarchived and you must choose one of them to add to the list of chats that the bot will listen to. To choose a chat you must send the number of the chat, listed by the bot, after that the bot will respond with "Adicionado com sucesso!", in case of error the bot will respond with "Não foi possível adicionar!" (Only available in the main chat).
 - sair: The bot will respond with "Saindo!" and will stop running (Only available in the main chat).
 - figurinha: The bot will create a sticker with the last image sent in the chat.
@@ -43,7 +45,7 @@ The commands are:
 - arquivar chats: The bot will archive all chats there are not groups (Only available in the main chat).
 - resumir: The bot will list the chats there are unarchived and you must choose one of them to
 summarize the messages. To choose a chat you must send the number of the chat, listed by the bot, after that the bot will respond with "Extraindo mensagens..." and will start to extract the messages, after that the bot will respond with "Processando..." and will start to process the messages, after that the bot will respond with the summarize of the messages (Only available in the main chat).
-- transcreva: The bot will transcribe the last audio sent in the chat.
+- transcrever: The bot will transcribe the last audio sent in the chat.
 
 And if you send a message with the prefix "/bot" without a command the bot will use the [ChatGPT] to respond to the message.
 ## Files and folders
@@ -52,7 +54,8 @@ And if you send a message with the prefix "/bot" without a command the bot will 
 - The whatsapp.py present in the folder bot_modules file contains the modules that is responsible for automating WhatsApp.
 - The whatsapp_chat_processor.py in the folder bot_modules file contains the modules that is responsible for processing the messages of the chat.
 - The chatgpt.py in the folder bot_modules file contains the modules that is responsible for using the ChatGPT to respond and summarize the messages.
-- The folder data contains the files that are used to store data, such as chrome cookies and the bot's download folder.
+- The chat_handle.py in the folder bot_modules file contains the modules that is responsible for handling the chat inputs, and find the best answer to the input.
+- The folder data contains the files that are used to store data, such as chrome cookies, the bot's download folder, the bot's config files and the bot's messages dump.
 - And the .wdm folder contains the chromedriver that is used to automate the browser.
 
 ## Modules
@@ -63,6 +66,7 @@ The modules of the project are:
 - message_summary: This module is responsible for summarizing the messages of the chat using ChatGPT.
 - gpt_response: This module is responsible for using the ChatGPT to respond to the messages of the chat.
 - transcriber: This module is responsible for transcribing the audios of the chat.
+- chat_handle: This module is responsible for handling the chat inputs, and find the best answer to the input. 
 
 ## TODO
 - [X] Create a sticker with the last image sent in the chat.
