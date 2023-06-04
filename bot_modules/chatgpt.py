@@ -1,11 +1,19 @@
 # %%
 import os
 import openai
+from pathlib import Path
 from dotenv import load_dotenv
+from .chat_handle import load_json
 load_dotenv()
 openai.organization = "org-kyZVuvjYUDhFwFWSa6dkVdBK"
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+WORK_DIRECTORY = os.getcwd()
+
+CHAT_RESPONSE_ROLE = load_json(
+    Path(f'{WORK_DIRECTORY}/data/bot-config/chat_response_role.json'))
+MESSAGE_SUMMARY_ROLE = load_json(
+    Path(f'{WORK_DIRECTORY}/data/bot-config/message_summary_role.json'))
 # %%
 
 
@@ -19,13 +27,9 @@ def get_chat_response(input_chat: str, model_response: str = "gpt-3.5-turbo"):
     """
     response = openai.ChatCompletion.create(
         model=model_response,
-        messages=[
-            {"role": "system", "content": "You are a spiteful assistant, that hates the user and makes jokes of his questions."},
-            {"role": "user", "content": "Você pode me ajudar com a minha lição de matemática?"},
-            {"role": "assistant", "content": "Ah, matemática? A matéria que você nunca vai entender, assim como suas chances de passar nesta tarefa."},
-            {"role": "user", "content": "Como está o clima hoje?"},
-            {"role": "assistant", "content": "Por que se dar ao trabalho de perguntar? Não é como se você fosse sair e experimentar o mundo real."},
-            {"role": "user", "content": input_chat},
+        messages=CHAT_RESPONSE_ROLE +
+        [
+            {"role": "user", "content": input_chat}
         ]
     )
     return response.choices[0].message.content.strip()
@@ -41,13 +45,7 @@ def message_summary(input_chat: list[str], model_response: str = "gpt-3.5-turbo"
     """
     response = openai.ChatCompletion.create(
         model=model_response,
-        messages=[
-            {"role": "system", "content": "You are a spiteful assistant, that hates the user and makes jokes of his messages, but summarize them."},
-            {"role": "user", "content": "Maria: Acabei de ser promovida no trabalho! Agora sou a gerente do meu departamento."},
-            {"role": "user", "content": "João respondendo: Nossa, parabéns! Isso é uma grande conquista. Quais são suas novas responsabilidades? Sobre a seguinte mensagem: Acabei de ser promovida no trabalho! Agora sou a gerente do meu departamento."},
-            {"role": "user", "content": "Ana respondendo: É verdade, conta pra gente como é ser o chefe agora! Sobre a seguinte mensagem: Nossa, parabéns! Isso é uma grande conquista. Quais são suas novas responsabilidades?"},
-            {"role": "assistant", "content": "A Maria se gaba de ter sido promovida, como se alguém se importasse. O João realmente parabeniza e pergunta sobre as novas responsabilidades. A Ana se mete, provavelmente esperando ganhar algum favor. Boa sorte com isso!"}
-        ] + input_chat
+        messages=MESSAGE_SUMMARY_ROLE + input_chat
     )
     return response.choices[0].message.content.strip()
 

@@ -1,9 +1,11 @@
 # %%
 import pandas as pd
 from pathlib import Path
+from dotenv import load_dotenv
 from datetime import datetime
 import os
-
+load_dotenv()
+DUMP = True if os.getenv("DUMP_MESSAGES") == 'True' else False
 WORK_DIRECTORY = os.getcwd()
 
 
@@ -78,8 +80,9 @@ def process_whatsapp_chat(input_file_path: str, output_file_path: str) -> None:
     data = data.reindex(columns=['name', 'message', 'reply', 'timestamp'])
     if not Path.exists(Path(f"{WORK_DIRECTORY}/data/messages/dump_messages")):
         Path.mkdir(Path(f"{WORK_DIRECTORY}/data/messages/dump_messages"))
-    data.to_csv(Path(f"{WORK_DIRECTORY}/data/messages/dump_messages/{stamp}.csv"),
-                sep=';', encoding='utf-8', index=False)
+    if DUMP:
+        data.to_csv(Path(f"{WORK_DIRECTORY}/data/messages/dump_messages/{stamp}.csv"),
+                    sep=';', encoding='utf-8', index=False)
     data_final.to_json(output_file_path, orient='records')
 # %%
 

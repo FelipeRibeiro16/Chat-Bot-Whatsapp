@@ -1,5 +1,6 @@
 # %%
 from bot_modules import whatsapp
+from dotenv import load_dotenv
 from pathlib import Path
 from bot_modules import chat as chat_module
 from bot_modules import chat_processor, message_processor
@@ -9,6 +10,8 @@ from bot_modules import message_summary
 from bot_modules import gpt_response
 from bot_modules import load_json, save_json, get_closest_match, get_inputs, get_answer, new_input
 # %%
+load_dotenv()
+CACHING = True if os.getenv("CACHING_RESPONSES") == 'True' else False
 WORK_DIRECTORY = os.getcwd()
 # %%
 wp = whatsapp()
@@ -47,7 +50,7 @@ while True:
     if not message:
         continue
 
-    answers = load_json(Path(f'{WORK_DIRECTORY}/data/messages/answers.json'))
+    answers = load_json(Path(f'{WORK_DIRECTORY}/data/bot-config/answers.json'))
 
     input = message_processor(chat_atual['last_message'], corresponded)
 
@@ -160,15 +163,15 @@ while True:
                 'Bot', response))
             new_answer = new_input(input, inputs, response)
             if new_answer is None:
+                chat.mark_as_replied(chat_atual, message)
                 continue
-            answers['answers'].append(new_answer)
-            save_json(
-                Path(f'{WORK_DIRECTORY}/data/messages/answers.json'), answers)
+            if CACHING:
+                answers['answers'].append(new_answer)
+                save_json(
+                    Path(f'{WORK_DIRECTORY}/data/bot-config/answers.json'), answers)
         else:
             chat.reply_message(chat_atual, msg_bot(
                 'Bot', 'Não entendi!'))
         chat.mark_as_replied(chat_atual, message)
 # %%
 wp.close()
-# %%
-import os
