@@ -47,6 +47,7 @@ while True:
     chat.rest()
     chat_atual = chat.listen_chats(corresponded)
     message = chat.last_message(chat_atual)
+    main_chat = chat.main_chat
     if not message:
         continue
 
@@ -93,24 +94,24 @@ while True:
                 chat.reply_message(chat_atual, msg_bot(
                     'Bot', 'Não foi possível transcrever!'))
                 chat.mark_as_replied(chat_atual, message)
-        elif match == 'adicionar':
+        elif match == 'adicionar' and chat.is_main_chat(chat_atual):
             chat.list_chats()
-            chat.reply_message(main_chat, msg_bot(
-                'Bot', 'Selecione o contato ou grupo?'))
+            chat.reply_message(chat_atual, msg_bot(
+                'Bot', 'Selecione o contato ou grupo.'))
             chat.mark_as_replied(chat_atual, message)
             chat_escolhido = chat.listen_messages(
-                main_chat, 'Selecione o contato ou grupo')
+                chat_atual, 'Selecione o contato ou grupo.')
             if chat_escolhido['message'].strip() in chat.title_of_chats.keys():
                 if chat.new_chat(chat.title_of_chats[chat_escolhido['message']]):
-                    chat.reply_message(main_chat, msg_bot(
+                    chat.reply_message(chat_atual, msg_bot(
                         'Bot', 'Adicionado com sucesso!'))
-                    chat.mark_as_replied(main_chat, chat_escolhido)
+                    chat.mark_as_replied(chat_atual, chat_escolhido)
                 else:
-                    chat.reply_message(main_chat, msg_bot(
+                    chat.reply_message(chat_atual, msg_bot(
                         'Bot', 'Não foi possível adicionar!'))
-                    chat.mark_as_replied(main_chat, chat_escolhido)
+                    chat.mark_as_replied(chat_atual, chat_escolhido)
             else:
-                chat.reply_message(main_chat, msg_bot(
+                chat.reply_message(chat_atual, msg_bot(
                     'Bot', 'Contato ou grupo não encontrado!'))
                 chat.mark_as_replied(chat_atual, message)
         elif match == 'figurinha':

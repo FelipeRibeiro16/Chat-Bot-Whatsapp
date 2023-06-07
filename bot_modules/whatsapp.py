@@ -50,6 +50,7 @@ class WhatsApp:
         chrome_options = Options()
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("window-size=1080,720")
+        chrome_options.add_argument("user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
         chrome_options.add_argument("--start-maximized")
         chrome_options.add_experimental_option(
             'excludeSwitches', ['enable-logging'])
@@ -73,8 +74,6 @@ class WhatsApp:
 
         self.driver = webdriver.Chrome(service=ChromeService(
             ChromeDriverManager(path=WORK_DIRECTORY, cache_valid_range=365).install()), options=chrome_options)
-        self.driver.execute_cdp_cmd('Network.setUserAgentOverride', {
-                                    "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36'})
         self.driver.execute_script(
             "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
         self.driver.get("https://web.whatsapp.com/")
@@ -253,10 +252,10 @@ class Chat:
             return True
         except:
             if self.is_main_chat(chat):
-                self.remove_chat(chat)
+                self.remove_chat(chat['title'])
                 self.main_chat_is_present()
             else:
-                self.remove_chat(chat)
+                self.remove_chat(chat['title'])
             return self.update()
 
     def new_chat(self, chat_title: str, main: bool = False) -> bool:
@@ -270,8 +269,9 @@ class Chat:
         Returns:
             bool: True if the chat was created successfully, False otherwise
         """
-        if self.if_exists(chat_title) and not main:
-            return False
+        self.update()
+        if self.if_exists(chat_title):
+            self.remove_chat(chat_title)
         chats_open = self.driver.find_elements(By.XPATH,
                                                """
                                                 //div[@data-testid="cell-frame-container"]
@@ -354,17 +354,30 @@ class Chat:
                 return True
         return False
 
-    def remove_chat(self, chat: dict) -> None:
+    def remove_chat(self, chat_title: str) -> None:
         """Removes a chat from the chat list
 
         Args:
-            chat (dict): The chat to be removed
+            chat_title (str): The chat title
 
         Returns:
             None
         """
-        if self.if_exists(chat['title']):
-            self.chats.remove(chat)
+        if self.if_exists(chat_title):
+            self.chats.remove(self.get_chat(chat_title))
+
+    def get_chat(self, chat_title: str) -> dict:
+        """Gets a chat from the chat list
+
+        Args:
+            chat_title (str): The chat title
+        
+        Returns:
+            dict: The chat
+        """
+        for chat in self.chats:
+            if chat['title'] == chat_title:
+                return chat
 
     def reset(self) -> None:
         """Resets the chat list
