@@ -1,6 +1,6 @@
 # Chat Bot WhatsApp
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/FelipeRibeiro16/Chat-Bot-Whatsapp/blob/d8987a06d7b5a4796090d6b2fd5dc8e2e01ce6af/README.md)
-[![pt-br](https://img.shields.io/badge/lang-pt--br-green.svg)](https://github.com/FelipeRibeiro16/Chat-Bot-Whatsapp/blob/d8987a06d7b5a4796090d6b2fd5dc8e2e01ce6af/README.pt-br.md)
+[![pt-br](https://img.shields.io/badge/lang-pt--br-green.svg)](https://github.com/FelipeRibeiro16/Chat-Bot-Whatsapp/blob/cbb4e521e351c7d2d5a91978953c871917af3146/README.pt-br.md)
 ## Description
 This project is a chat bot for WhatsApp, it is a bot that can be used to send messages, create stickers, archive chats, transcribe audios, summarize chats and use the ChatGPT in the chats. This project is made with the help of the [selenium](https://www.selenium.dev/) library, which is a library that allows us to automate the browser, in this case we use it to automate WhatsApp.
 
