@@ -50,7 +50,8 @@ class WhatsApp:
         chrome_options = Options()
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("window-size=1080,720")
-        chrome_options.add_argument("user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
+        chrome_options.add_argument(
+            "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
         chrome_options.add_argument("--start-maximized")
         chrome_options.add_experimental_option(
             'excludeSwitches', ['enable-logging'])
@@ -371,7 +372,7 @@ class Chat:
 
         Args:
             chat_title (str): The chat title
-        
+
         Returns:
             dict: The chat
         """
@@ -1040,10 +1041,14 @@ class Chat:
                                                 //div[@data-testid="cell-frame-container"]
                                                 """)
             for chat_open in chats_open:
-                chat_active_title = chat_open.find_element(By.XPATH,
-                                                           f"""
-                                                                 .//div[@data-testid="cell-frame-title"]/span[1]
-                                                                 """).get_attribute("title")
+                try:
+                    chat_active = WebDriverWait(chat_open, 5).until(EC.presence_of_element_located((By.XPATH,
+                                                                                                    """
+                                                                                        .//div[@data-testid="cell-frame-title"]/span[1]
+                                                                                        """)))
+                except TimeoutException:
+                    continue
+                chat_active_title = chat_active.get_attribute("title")
                 if by == 'groups':
                     by_choose = self.__is_group(chat_open.text.split('\n'))
                 elif by == 'chats':

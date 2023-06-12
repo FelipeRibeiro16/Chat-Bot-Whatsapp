@@ -66,7 +66,7 @@ while True:
                 'Bot', 'Qual chat você deseja resumir?'))
             chat.mark_as_replied(chat_atual, message)
             chat_escolhido = chat.listen_messages(
-                main_chat, 'Qual chat você deseja resumir?')
+                chat_atual, 'Qual chat você deseja resumir?')
             if chat_escolhido['message'] in chat.title_of_chats.keys():
                 chat.reply_message(chat_atual, msg_bot(
                     'Bot', 'Extraindo mensagens...'))
@@ -137,6 +137,7 @@ while True:
             chat.archive()
             chat.reply_message(chat_atual, msg_bot(
                 'Bot', 'Conversas arquivadas com sucesso!'))
+            chat.mark_as_replied(chat_atual, message)
         elif match == 'sair' in chat_atual['last_message'] and chat.is_main_chat(chat_atual):
             chat.reply_message(chat_atual, msg_bot('Bot', 'Saindo...'))
             chat.mark_as_replied(chat_atual, message)
