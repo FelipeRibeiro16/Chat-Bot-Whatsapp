@@ -31,10 +31,6 @@ def msg_bot(bot_name: str, message: str) -> str:
         str: Message with the bot name and the message in a code block
     """
     return f'_*{bot_name}*_: ```{message}```'
-
-
-# %%
-chat.reset()
 # %%
 corresponded = '/bot'
 print('Define main chat...')

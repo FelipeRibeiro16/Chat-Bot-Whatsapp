@@ -1076,7 +1076,14 @@ class Chat:
                                              //li[@data-testid='mi-archive']
                                              """
                                                  ).click()
-                        sleep(1)
+                        WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable((By.XPATH,
+                                                                                        """
+                                                                                            //span[@data-testid="x-alt"]
+                                                                                            """)))
+                        self.driver.find_element(By.XPATH,
+                                                 """
+                                                //span[@data-testid="x-alt"]
+                                                """).click()
                         break
             else:
                 return None

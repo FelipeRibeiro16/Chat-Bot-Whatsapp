@@ -78,6 +78,6 @@ def get_closest_match(input: str, inputs: list[str]) -> str:
         str: closest match
     """
     try:
-        return get_close_matches(input, inputs, n=1, cutoff=0.9)[0]
+        return get_close_matches(input, inputs, n=1, cutoff=0.8)[0]
     except IndexError:
         return ''
