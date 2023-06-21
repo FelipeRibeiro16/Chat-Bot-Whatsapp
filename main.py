@@ -31,6 +31,8 @@ def msg_bot(bot_name: str, message: str) -> str:
         str: Message with the bot name and the message in a code block
     """
     return f'_*{bot_name}*_: ```{message}```'
+
+
 # %%
 corresponded = '/bot'
 print('Define main chat...')
@@ -39,6 +41,7 @@ if chat.listen_set_main_chat(f'{corresponded} principal'):
 main_chat = chat.main_chat
 chat.reply_message(main_chat, msg_bot('Bot', 'Olá! Estou pronto!'))
 print('Running...')
+# %%
 while True:
     chat.rest()
     chat_atual = chat.listen_chats(corresponded)

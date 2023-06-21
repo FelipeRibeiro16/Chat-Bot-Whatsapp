@@ -307,7 +307,7 @@ class Chat:
         return False
 
     def rest(self) -> None:
-        """Rests the bot
+        """Return the bot to the main chat
 
         Returns:
             None
