@@ -81,7 +81,7 @@ while True:
                 chat.reply_message(chat_atual, msg_bot(
                     'Bot', 'Chat não encontrado!'))
                 chat.mark_as_replied(chat_atual, chat_escolhido)
-        elif match == 'transcrever':
+        elif match == 'transcreva':
             transcribe = chat.audio_reader()
             if transcribe:
                 chat.reply_message(chat_atual, msg_bot('Bot', transcribe))
